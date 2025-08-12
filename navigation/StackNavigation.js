@@ -158,7 +158,6 @@ const CustomEditHeader = ({ theme, title, type }) => {
 function HomeStack({ navigation }) {
   const { theme } = useTheme();
   const { isLogin } = useContext(AuthContext);
-  const [initialNotification, setinitialNotification] = useState();
   // Interstitial Ad logic remains here as it's screen-specific
   const interstitialAdRef = useRef(null);
   const [interstitialLoaded, setInterstitialLoaded] = useState(false);
@@ -183,70 +182,70 @@ function HomeStack({ navigation }) {
 
     newAd.load();
   };
-  const setupFCMListeners = () => {
-    // 1. Handle background/quit notifications that open the app
-    // This is called when the app is opened from a notification tap
-    // while the app was in the background or quit state.
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log(
-            'Notification opened app from quit/background state:',
-            remoteMessage.data,
-          );
-          setinitialNotification(remoteMessage);
-          // Navigate to a specific screen based on notification data
-          // Ensure navigationRef.current is available before attempting to navigate
-          // if (navigationRef.current) {
-          navigation.navigate('Splash', { initialNotification });
-          // }
-        }
-      })
-      .catch(error =>
-        console.error('Error getting initial notification:', error),
-      );
+  // const setupFCMListeners = () => {
+  //   // 1. Handle background/quit notifications that open the app
+  //   // This is called when the app is opened from a notification tap
+  //   // while the app was in the background or quit state.
+  //   messaging()
+  //     .getInitialNotification()
+  //     .then(remoteMessage => {
+  //       console.log(remoteMessage);
 
-    // 2. Handle notifications received when the app is in the foreground
-    // This listener fires when a notification arrives while the app is active.
-    // You might want to display a local notification or an in-app message here.
-    const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-      console.log('Foreground message received:', remoteMessage);
-      // You can use your NotificationServices.js to show a local notification
-      // based on this remoteMessage for a better user experience.
-      // sendRandomNotification(
-      //   remoteMessage.notification.title,
-      //   remoteMessage.notification.body,
-      // );
-    });
+  //       if (remoteMessage) {
+  //         console.log(
+  //           'Notification opened app from quit/background state:',
+  //           remoteMessage.data,
+  //         );
+  //         // Navigate to a specific screen based on notification data
+  //         // Ensure navigationRef.current is available before attempting to navigate
+  //         // if (navigationRef.current) {
+  //         navigation.navigate('Splash', { initialNotification: remoteMessage });
+  //         // }
+  //       }
+  //     })
+  //     .catch(error =>
+  //       console.error('Error getting initial notification:', error),
+  //     );
 
-    // 3. Handle notifications tapped when the app is in the background
-    // This listener fires when a user taps a notification and the app is in the background.
-    const unsubscribeOnNotificationOpenedApp =
-      messaging().onNotificationOpenedApp(async remoteMessage => {
-        console.log(
-          'Notification opened app from background state:',
-          remoteMessage.data,
-        );
-        setinitialNotification(remoteMessage);
-        // Navigate to a specific screen based on notification data
-        navigation.navigate('Splash', {
-          initialNotification,
-        });
-      });
+  //   // 2. Handle notifications received when the app is in the foreground
+  //   // This listener fires when a notification arrives while the app is active.
+  //   // You might want to display a local notification or an in-app message here.
+  //   const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+  //     console.log('Foreground message received:', remoteMessage);
+  //     // You can use your NotificationServices.js to show a local notification
+  //     // based on this remoteMessage for a better user experience.
+  //     // sendRandomNotification(
+  //     //   remoteMessage.notification.title,
+  //     //   remoteMessage.notification.body,
+  //     // );
+  //   });
 
-    // Return unsubscribe functions for cleanup
-    return () => {
-      unsubscribeOnMessage();
-      unsubscribeOnNotificationOpenedApp();
-    };
-  };
+  //   // 3. Handle notifications tapped when the app is in the background
+  //   // This listener fires when a user taps a notification and the app is in the background.
+  //   const unsubscribeOnNotificationOpenedApp =
+  //     messaging().onNotificationOpenedApp(async remoteMessage => {
+  //       console.log(
+  //         'Notification opened app from background state:',
+  //         remoteMessage.data,
+  //       );
+  //       // Navigate to a specific screen based on notification data
+  //       navigation.navigate('Splash', {
+  //         initialNotification: remoteMessage,
+  //       });
+  //     });
+
+  //   // Return unsubscribe functions for cleanup
+  //   return () => {
+  //     unsubscribeOnMessage();
+  //     unsubscribeOnNotificationOpenedApp();
+  //   };
+  // };
   useEffect(() => {
     createAndLoadInterstitialAd();
-    const unsubscribeFCM = setupFCMListeners();
-    return () => {
-      unsubscribeFCM();
-    };
+    // const unsubscribeFCM = setupFCMListeners();
+    // return () => {
+    //   unsubscribeFCM();
+    // };
   }, []);
 
   const showInterstitialAd = () => {

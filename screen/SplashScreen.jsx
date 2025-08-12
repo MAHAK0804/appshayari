@@ -1,54 +1,107 @@
+/* eslint-disable no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Image, ActivityIndicator, Text } from "react-native";
+import messaging from '@react-native-firebase/messaging';
 
-const SplashScreen = ({ navigation, route }) => {
-    const { initialNotification } = route.params || {};
+const SplashScreen = ({ navigation }) => {
     const [loadingData, setLoadingData] = useState(false);
+    const [initialNotification, setInitialNoti] = useState(null);
+    const homeTimeoutRef = useRef(null); // To store fallback timer
 
+    const setupFCMListeners = async () => {
+        try {
+            // 1. App opened from quit/background via notification tap
+            const remoteMessage = await messaging().getInitialNotification();
+            if (remoteMessage) {
+                console.log(
+                    'Notification opened app from quit/background state:',
+                    remoteMessage.data
+                );
+                setInitialNoti(remoteMessage);
+            }
+
+            // 2. Foreground notifications
+            const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+                console.log('Foreground message received:', remoteMessage);
+            });
+
+            // 3. App in background, opened via tap
+            const unsubscribeOnNotificationOpenedApp =
+                messaging().onNotificationOpenedApp(async remoteMessage => {
+                    console.log(
+                        'Notification opened app from background state:',
+                        remoteMessage.data
+                    );
+                    setInitialNoti(remoteMessage);
+                });
+
+            return () => {
+                unsubscribeOnMessage();
+                unsubscribeOnNotificationOpenedApp();
+            };
+        } catch (error) {
+            console.error('Error setting up FCM listeners:', error);
+        }
+    };
+
+    // Step 1: Check notifications on mount
     useEffect(() => {
-        const handleNavigation = async () => {
-            if (initialNotification) {
-                console.log("SplashScreen: Initial notification detected. Fetching data...");
-                setLoadingData(true);
+        let cleanup;
+        (async () => {
+            cleanup = await setupFCMListeners();
+
+            // If no initial notification yet, set fallback to Home after 5 sec
+            homeTimeoutRef.current = setTimeout(() => {
+                console.log("SplashScreen: No initial notification, navigating to Home.");
+                navigation.replace("Home");
+            }, 5000);
+        })();
+
+        return () => {
+            if (homeTimeoutRef.current) clearTimeout(homeTimeoutRef.current);
+            if (cleanup) cleanup();
+        };
+    }, []);
+
+    // Step 2: Handle navigation if notification found
+    useEffect(() => {
+        if (initialNotification) {
+            // Cancel Home fallback
+            if (homeTimeoutRef.current) {
+                clearTimeout(homeTimeoutRef.current);
+                homeTimeoutRef.current = null;
+            }
+
+            console.log("SplashScreen: Initial notification detected. Fetching data...");
+            setLoadingData(true);
+
+            (async () => {
                 try {
                     const res = await axios.get(`https://hindishayari.onrender.com/api/shayaris`);
                     const fetchedShayaris = res.data.shayaris;
-
-                    console.log("SplashScreen: Data fetched, navigating to ShayariFullView.");
-                    console.log(fetchedShayaris.findIndex((s) => s._id === initialNotification.data?.shayari_id));
-                    // console.log(initialNotification.data);
+                    const shayariIdFromNoti = initialNotification.data?.shayari_id;
 
                     navigation.replace("ShayariFullView", {
-                        shayariId: initialNotification.data?.shayariId,
+                        shayariId: shayariIdFromNoti,
                         shayari: {
-                            _id: initialNotification.data?.shayariId,
+                            _id: shayariIdFromNoti,
                             text: initialNotification.notification.body,
                         },
                         title: 'Popular Shayaris',
-                        shayariList: fetchedShayaris, // Pass the fetched list
-                        initialIndex: fetchedShayaris.findIndex((s) => s._id === initialNotification.data?.shayari_id),
+                        shayariList: fetchedShayaris,
+                        initialIndex: fetchedShayaris.findIndex((s) => s._id === shayariIdFromNoti),
                     });
 
                 } catch (error) {
-                    console.error("SplashScreen: Error fetching all shayaris ->", error);
-                    // Fallback to home if there's a network or API error
+                    console.error("SplashScreen: Error fetching shayaris ->", error);
                     navigation.replace("Home");
                 } finally {
                     setLoadingData(false);
                 }
-            } else {
-                // If no initial notification, proceed to Home after 2 seconds
-                console.log("SplashScreen: No initial notification, navigating to Home after 5 seconds.");
-                const timeout = setTimeout(() => {
-                    navigation.replace("Home");
-                }, 5000);
-                return () => clearTimeout(timeout);
-            }
-        };
-
-        handleNavigation();
+            })();
+        }
     }, [initialNotification]);
 
     return (
