@@ -492,24 +492,28 @@ export default function ShayariCardExact({ route }) {
                     // require("../assets/bg31.webp"),
                     // require("../assets/bg32.webp"),
 
-                  ].map((img, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => {
-                        setBackgroundImage(img);
-                        setBackgroundColor(null);
-                      }}
-                      style={styles.bgImageOption}
-                    >
-                      <Image
-                        source={img}
-                        style={{
-                          width: 80,
-                          height: 80,
+                  ].map((img, index) => {
+                    console.log("img", img);
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          setBackgroundImage(img);
+                          setBackgroundColor(null);
                         }}
-                      />
-                    </TouchableOpacity>
-                  ))}
+                        style={styles.bgImageOption}
+                      >
+                        <Image
+                          source={img}
+                          style={{
+                            width: 80,
+                            height: 80,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )
+                  })}
                 </ScrollView>
               </View>
             )}

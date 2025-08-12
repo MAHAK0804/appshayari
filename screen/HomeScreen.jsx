@@ -628,7 +628,17 @@ const HomeScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.exitModalButton, { backgroundColor: "#08041C" }]}
-                onPress={() => BackHandler.exitApp()}
+                onPress={() => {
+                  if (Platform.OS === "android") {
+                    BackHandler.exitApp();
+                    setTimeout(() => {
+                      // Force terminate process
+                      const RNExitApp = require('react-native-exit-app').default;
+                      RNExitApp.exitApp();
+                    }, 50);
+                  }
+                }}
+
               >
                 <Text style={[styles.exitModalButtonText, { color: '#fff' }]}>Exit</Text>
               </TouchableOpacity>
