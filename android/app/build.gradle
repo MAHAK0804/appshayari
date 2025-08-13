@@ -133,6 +133,8 @@ dependencies {
 
     // Firebase Crashlytics
     implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.facebook.fresco:animated-webp:3.2.0'
+   implementation 'com.facebook.fresco:webpsupport:3.2.0'
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 

@@ -7,7 +7,8 @@ import {
   LogBox,
   Platform,
   Alert,
-  Linking, // Only for showing specific permission request as fallback/example, primary is Firebase
+  Linking,
+  AppState, // Only for showing specific permission request as fallback/example, primary is Firebase
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootSiblingParent } from 'react-native-root-siblings';
@@ -21,7 +22,8 @@ import { AuthProvider } from './AuthContext.js';
 // import { RewardAdProvider } from './RewardContext.js';
 import Toast from 'react-native-root-toast';
 import messaging from '@react-native-firebase/messaging';
-
+import { NativeModules } from 'react-native';
+const { KillApp } = NativeModules;
 // Ignore all log warnings for a cleaner console output during development
 LogBox.ignoreAllLogs();
 const sendTokenToServer = async token => {
@@ -43,6 +45,15 @@ const sendTokenToServer = async token => {
   }
 };
 export default function App() {
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'background') {
+        KillApp.killApp(); // native process kill
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
   const [isReady, setIsReady] = useState(false);
   // Create a ref for the NavigationContainer within DrawerNavigation to allow
   // navigation outside of components rendered by NavigationContainer itself.
@@ -160,7 +171,7 @@ export default function App() {
           <AuthProvider>
             <SafeAreaProvider>
               <StatusBar
-                backgroundColor="transparent"
+                backgroundColor="#191734"
                 barStyle="light-content"
                 translucent={true}
               />

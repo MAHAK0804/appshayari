@@ -19,7 +19,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Yup from "yup";
 import { fontScale, scaleFont, verticalScale } from "../Responsive";
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -84,13 +84,14 @@ export default function LoginScreen() {
   return (
     <>
       <View style={styles.background}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-
+        <SafeAreaView style={[styles.safeArea, { paddingTop: verticalScale(15) }]}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        </SafeAreaView>
         <View style={styles.container}>
           <Text style={styles.title}>Login to Shayari App</Text>
           <Text
@@ -172,6 +173,9 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 0,
+  },
   background: { flex: 1, backgroundColor: "#08041C" },
   container: { paddingHorizontal: 24, paddingVertical: 20 },
   backButton: { padding: 24, marginVertical: verticalScale(10) },

@@ -21,17 +21,19 @@
   android:value="ca-app-pub-9762222984677056~3310100092"/>
 
       <activity
-        android:name=".MainActivity"
-        android:label="Hindi Shayari Lok"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-        android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize"
-        android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-      </activity>
+    android:name=".MainActivity"
+    android:exported="true"
+    android:launchMode="singleTask"
+    android:clearTaskOnLaunch="true"
+    android:windowSoftInputMode="adjustResize">
+    
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+
+
       <provider
     android:name="androidx.core.content.FileProvider"
     android:authorities="${applicationId}.provider"

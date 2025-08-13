@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   PermissionsAndroid,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import WhiteText from "../assets/text.svg";
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -245,63 +246,66 @@ export default function WriteShayari({ route }) {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <View style={styles.customHeader}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Home")}
-              style={styles.headerIcon}
-            >
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
+          <SafeAreaView style={[styles.safeArea, { paddingTop: verticalScale(20) }]}>
 
-            <Text style={styles.headerTitle}>Write Your Shayari</Text>
+            <View style={styles.customHeader}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Home")}
+                style={styles.headerIcon}
+              >
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={async () => {
-                if (shayariText.trim() === "") {
-                  showCustomAlert(
-                    "Empty Shayari",
-                    "Please write something before posting!"
-                  );
-                  return;
-                }
+              <Text style={styles.headerTitle}>Write Your Shayari</Text>
 
-                try {
-                  if (shayari?._id) {
-                    // 🔁 Update existing Shayari
-                    await axios.put(
-                      `https://hindishayari.onrender.com/api/users/shayaris/update/${shayari._id}`,
-                      { userId, text: shayariText }
+              <TouchableOpacity
+                onPress={async () => {
+                  if (shayariText.trim() === "") {
+                    showCustomAlert(
+                      "Empty Shayari",
+                      "Please write something before posting!"
                     );
-                    showCustomAlert("Updated", "Thank You! Your Shayari has been successfully saved in My Shayari.");
-                  } else {
-                    // 🆕 Post new Shayari
-                    await axios.post(
-                      "https://hindishayari.onrender.com/api/users/shayaris/add",
-                      { userId, text: shayariText }
-                    );
-                    showCustomAlert("Posted", "Thank You! Your Shayari has been successfully saved in My Shayari.");
+                    return;
                   }
 
-                  // ✅ Reset state and navigate
-                  setIsEditing(false);
-                  setShayariText("");
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: "HomeScreen" }],
-                    })
-                  );
+                  try {
+                    if (shayari?._id) {
+                      // 🔁 Update existing Shayari
+                      await axios.put(
+                        `https://hindishayari.onrender.com/api/users/shayaris/update/${shayari._id}`,
+                        { userId, text: shayariText }
+                      );
+                      showCustomAlert("Updated", "Thank You! Your Shayari has been successfully saved in My Shayari.");
+                    } else {
+                      // 🆕 Post new Shayari
+                      await axios.post(
+                        "https://hindishayari.onrender.com/api/users/shayaris/add",
+                        { userId, text: shayariText }
+                      );
+                      showCustomAlert("Posted", "Thank You! Your Shayari has been successfully saved in My Shayari.");
+                    }
 
-                } catch (error) {
-                  console.log("Shayari save error:", error);
-                  showCustomAlert("Error", "Failed to save Shayari.");
-                }
-              }}
-              style={styles.headerIcon}
-            >
-              <TickIcon width={40} height={40} />
-            </TouchableOpacity>
-          </View>
+                    // ✅ Reset state and navigate
+                    setIsEditing(false);
+                    setShayariText("");
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "HomeScreen" }],
+                      })
+                    );
+
+                  } catch (error) {
+                    console.log("Shayari save error:", error);
+                    showCustomAlert("Error", "Failed to save Shayari.");
+                  }
+                }}
+                style={styles.headerIcon}
+              >
+                <TickIcon width={40} height={40} />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
 
           {/* Shayari Card Row */}
           <View style={styles.cardRow}>
@@ -472,13 +476,15 @@ export default function WriteShayari({ route }) {
 const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 0,
+  },
   container: { flex: 1, backgroundColor: "#000" },
   customHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 30,
-    paddingBottom: 10,
+    // paddingVertical: verticalScale(10),
     elevation: 4,
     paddingHorizontal: 10,
     backgroundColor: "#191734",

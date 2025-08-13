@@ -15,9 +15,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { AuthContext } from "../AuthContext";
-import { fontScale, scaleFont } from "../Responsive";
+import { fontScale, scaleFont, verticalScale } from "../Responsive";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 
@@ -162,13 +163,14 @@ export default function VerifyOTPScreen({ navigation, route }) {
   return (
     <>
       <View style={styles.background}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-
+        <SafeAreaView style={[styles.safeArea, { paddingTop: verticalScale(15) }]}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        </SafeAreaView>
         {toastVisible && (
           <View style={styles.toastContainer}>
             <Text style={styles.toastOtpText}>Your OTP: {showOtp}</Text>
@@ -238,6 +240,10 @@ export default function VerifyOTPScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 0
+
+  },
   background: { flex: 1, backgroundColor: "#08041C" },
   container: {
     padding: 24,

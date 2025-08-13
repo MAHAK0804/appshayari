@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -100,7 +101,7 @@ const CustomEditHeader = ({ theme, title, type }) => {
     }
   };
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: verticalScale(20) }]}>
       <View style={styles.customHeader}>
         <TouchableOpacity
           onPress={() => {
@@ -145,7 +146,7 @@ const CustomEditHeader = ({ theme, title, type }) => {
             }}
             style={{ marginRight: scale(7) }}
           >
-            <CreateShayari width={32} height={32} />
+            <CreateShayari width={50} height={50} />
           </TouchableOpacity>
         )}
       </View>
@@ -284,51 +285,55 @@ function HomeStack({ navigation }) {
         name="Home"
         component={HomeScreen}
         options={{
+          // headerShown: false,
           header: () => (
-            <View style={[styles.customHeader]}>
-              <TouchableOpacity
-                onPress={() => navigation.openDrawer()}
-                style={styles.iconLeft}
-              >
-                <MenuBar width={40} height={40} />
-              </TouchableOpacity>
-
-              <View style={styles.titleContainer}>
-                <Text
-                  numberOfLines={1}
-                  style={[styles.headerTitleText, { color: theme.primary }]}
+            <SafeAreaView
+              style={[styles.safeArea, { paddingTop: verticalScale(20) }]}
+            >
+              <View style={[styles.customHeader]}>
+                <TouchableOpacity
+                  onPress={() => navigation.openDrawer()}
+                  style={styles.iconLeft}
                 >
-                  Home
-                </Text>
+                  <MenuBar width={40} height={40} />
+                </TouchableOpacity>
+                <View style={styles.titleContainer}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.headerTitleText, { color: theme.primary }]}
+                  >
+                    Home
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    // showRewardAd();
+                    showInterstitialAd();
+                    return isLogin
+                      ? navigation.navigate('HomeStack', {
+                          screen: 'Writeshayari',
+                        })
+                      : navigation.navigate('HomeStack', {
+                          screen: 'LoginScreen',
+                        });
+                  }}
+                  style={styles.iconLeft}
+                >
+                  <CreateShayari width={50} height={50} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('HomeStack', {
+                      screen: 'Shayari',
+                      params: { type: 'favorites', title: 'Favourite' },
+                    })
+                  }
+                  style={{ marginRight: scale(7) }}
+                >
+                  <FavShayari width={50} height={50} />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                onPress={() => {
-                  // showRewardAd();
-                  showInterstitialAd();
-                  return isLogin
-                    ? navigation.navigate('HomeStack', {
-                        screen: 'Writeshayari',
-                      })
-                    : navigation.navigate('HomeStack', {
-                        screen: 'LoginScreen',
-                      });
-                }}
-                style={styles.iconLeft}
-              >
-                <CreateShayari width={40} height={40} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('HomeStack', {
-                    screen: 'Shayari',
-                    params: { type: 'favorites', title: 'Favourite' },
-                  })
-                }
-                style={{ marginRight: scale(7) }}
-              >
-                <FavShayari width={40} height={45} />
-              </TouchableOpacity>
-            </View>
+            </SafeAreaView>
           ),
         }}
       />
@@ -414,14 +419,13 @@ const styles = StyleSheet.create({
     flex: 0,
   },
   customHeader: {
-    backgroundColor: '#191734', // Match the header background
+    backgroundColor: '#191734',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center', // Space between items
     paddingHorizontal: scale(10),
-    paddingTop: verticalScale(30), // Adjusted vertical padding
-    paddingBottom: verticalScale(15),
-    elevation: 4,
+    // paddingVertical: verticalScale(10),
+    // elevation: 4,
   },
   iconLeft: {
     marginRight: 5,
