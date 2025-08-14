@@ -66,10 +66,7 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
     override fun getMainComponentName(): String = "shayariApp"
-override fun onStop() {
-        super.onStop()
-        finish() // Background me jane pe activity destroy
-    }
+
     /**
      * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
      * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
