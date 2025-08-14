@@ -90,9 +90,7 @@ export default function CustomDrawerContent(props) {
       updateActionStatus(true)
 
       Share.share({
-        message: `💖 Love. 💔 Sad. 😄 Funny. 🧠 Motivational. 
-🎯All in one app — Hindi Shayari Lok!
-📲 Share your mood in style — text or image, with just one tap.
+        message: `📲 Share your mood in style — text or image, with just one tap
 
   🔗 https://play.google.com/store/apps/details?id=com.shayariapp`,
       });
