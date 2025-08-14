@@ -1,19 +1,17 @@
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
+// /* eslint-disable react-native/no-inline-styles */
+// /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useRef, useState } from 'react'; // Keep React and hooks
+import React, { useContext, useEffect, useState } from 'react'; // Keep React and hooks
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Platform,
-  Alert,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Keep if used in CustomDrawerContent
+// import Ionicons from 'react-native-vector-icons/Ionicons'; // Keep if used in CustomDrawerContent
 
 import { useTheme } from '../ThemeContext';
 import CustomDrawerContent from '../CustomDrawerContent';
@@ -36,69 +34,26 @@ import MenuBar from '../assets/MENU BAR.svg'; // SVG import
 import BackArrow from '../assets/left arrow.svg'; // SVG import
 // import { useRewardAd } from '../RewardContext'; // Keep if you uncomment later
 import SplashScreen from '../screen/SplashScreen';
-import messaging from '@react-native-firebase/messaging'; // Will be removed from HomeStack
-import { PERMISSIONS, request, RESULTS } from 'react-native-permissions'; // Will be removed from HomeStack
-import { requestNotificationPermission } from '../Notification'; // Will be removed from HomeStack
 import {
   AdEventType,
   InterstitialAd,
   TestIds,
-} from 'react-native-google-mobile-ads'; // Used in CustomEditHeader and HomeStack
+} from 'react-native-google-mobile-ads';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
-// This sendTokenToServer function should be moved to App.js or a separate utility
-// if it's not strictly tied to HomeStack's lifecycle.
-// For now, keeping it here for context as it was in your provided code.
-
-const CustomEditHeader = ({ theme, title, type }) => {
+const CustomEditHeader = ({ theme, title, type, ads }) => {
   const navigation = useNavigation();
   const { isLogin } = useContext(AuthContext);
   // const { showRewardAd } = useRewardAd();
-  const interstitialAdRef = useRef(null);
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
 
-  const createAndLoadInterstitialAd = () => {
-    const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-      requestNonPersonalizedAdsOnly: true,
-    });
+  const handleBackPress = () => {
+    ads;
+    // Define the navigation logic you want to run after the ad closes
+    navigation.navigate('Home');
 
-    interstitialAdRef.current = newAd;
-
-    newAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialLoaded(true);
-      console.log('Interstitial ad loaded');
-    });
-
-    newAd.addAdEventListener(AdEventType.CLOSED, () => {
-      // Reload a new ad when closed
-      setInterstitialLoaded(false);
-      createAndLoadInterstitialAd();
-    });
-
-    newAd.load();
-  };
-
-  useEffect(() => {
-    createAndLoadInterstitialAd();
-  }, []);
-
-  const showInterstitialAd = () => {
-    const ad = interstitialAdRef.current;
-    if (ad && interstitialLoaded) {
-      try {
-        ad.show();
-        navigation.goBack();
-      } catch (error) {
-        navigation.goBack();
-      }
-    } else {
-      console.log('Interstitial not ready, loading new one...');
-      navigation.goBack();
-
-      createAndLoadInterstitialAd();
-    }
+    // Call the global showAd function and pass the callback
   };
   return (
     <SafeAreaView style={[styles.safeArea, { paddingTop: verticalScale(20) }]}>
@@ -107,12 +62,9 @@ const CustomEditHeader = ({ theme, title, type }) => {
           onPress={() => {
             if (type === 'category') {
               // showRewardAd();
-              if (interstitialLoaded) {
-                showInterstitialAd();
-                // Removed navigation.goBack() here as showInterstitialAd already calls it
-              } else {
-                navigation.goBack();
-              }
+
+              handleBackPress();
+              // Removed navigation.goBack() here as showInterstitialAd already calls it
             } else if (title === 'Popular Shayaris') {
               navigation.navigate('Home');
             } else {
@@ -135,7 +87,6 @@ const CustomEditHeader = ({ theme, title, type }) => {
           <TouchableOpacity
             onPress={() => {
               // showRewardAd();
-
               return isLogin
                 ? navigation.navigate('HomeStack', {
                     screen: 'Writeshayari',
@@ -159,108 +110,28 @@ const CustomEditHeader = ({ theme, title, type }) => {
 function HomeStack({ navigation }) {
   const { theme } = useTheme();
   const { isLogin } = useContext(AuthContext);
-  // Interstitial Ad logic remains here as it's screen-specific
-  const interstitialAdRef = useRef(null);
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
-
-  const createAndLoadInterstitialAd = () => {
-    const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-      requestNonPersonalizedAdsOnly: true,
-    });
-
-    interstitialAdRef.current = newAd;
-
-    newAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialLoaded(true);
-      console.log('Interstitial ad loaded');
-    });
-
-    newAd.addAdEventListener(AdEventType.CLOSED, () => {
-      // Reload a new ad when closed
-      setInterstitialLoaded(false);
-      createAndLoadInterstitialAd();
-    });
-
-    newAd.load();
-  };
-  // const setupFCMListeners = () => {
-  //   // 1. Handle background/quit notifications that open the app
-  //   // This is called when the app is opened from a notification tap
-  //   // while the app was in the background or quit state.
-  //   messaging()
-  //     .getInitialNotification()
-  //     .then(remoteMessage => {
-  //       console.log(remoteMessage);
-
-  //       if (remoteMessage) {
-  //         console.log(
-  //           'Notification opened app from quit/background state:',
-  //           remoteMessage.data,
-  //         );
-  //         // Navigate to a specific screen based on notification data
-  //         // Ensure navigationRef.current is available before attempting to navigate
-  //         // if (navigationRef.current) {
-  //         navigation.navigate('Splash', { initialNotification: remoteMessage });
-  //         // }
-  //       }
-  //     })
-  //     .catch(error =>
-  //       console.error('Error getting initial notification:', error),
-  //     );
-
-  //   // 2. Handle notifications received when the app is in the foreground
-  //   // This listener fires when a notification arrives while the app is active.
-  //   // You might want to display a local notification or an in-app message here.
-  //   const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-  //     console.log('Foreground message received:', remoteMessage);
-  //     // You can use your NotificationServices.js to show a local notification
-  //     // based on this remoteMessage for a better user experience.
-  //     // sendRandomNotification(
-  //     //   remoteMessage.notification.title,
-  //     //   remoteMessage.notification.body,
-  //     // );
-  //   });
-
-  //   // 3. Handle notifications tapped when the app is in the background
-  //   // This listener fires when a user taps a notification and the app is in the background.
-  //   const unsubscribeOnNotificationOpenedApp =
-  //     messaging().onNotificationOpenedApp(async remoteMessage => {
-  //       console.log(
-  //         'Notification opened app from background state:',
-  //         remoteMessage.data,
-  //       );
-  //       // Navigate to a specific screen based on notification data
-  //       navigation.navigate('Splash', {
-  //         initialNotification: remoteMessage,
-  //       });
-  //     });
-
-  //   // Return unsubscribe functions for cleanup
-  //   return () => {
-  //     unsubscribeOnMessage();
-  //     unsubscribeOnNotificationOpenedApp();
-  //   };
-  // };
+  const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
-    createAndLoadInterstitialAd();
-    // const unsubscribeFCM = setupFCMListeners();
-    // return () => {
-    //   unsubscribeFCM();
-    // };
+    initInterstital();
   }, []);
-
-  const showInterstitialAd = () => {
-    const ad = interstitialAdRef.current;
-    if (ad && interstitialLoaded) {
-      ad.show();
-    } else {
-      console.log('Interstitial not ready, loading new one...');
-      createAndLoadInterstitialAd();
+  const initInterstital = async () => {
+    const interstitialAd = InterstitialAd.createForAdRequest(
+      TestIds.INTERSTITIAL,
+    );
+    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      setInterstitialAds(interstitialAd);
+      console.log('Interstital Ads Loaded');
+    });
+    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+      console.log('Interstital Ads closed');
+    });
+    interstitialAd.load();
+  };
+  const showInterstitialAd = async () => {
+    if (interstitialAds) {
+      interstitialAds.show();
     }
   };
-
-  // Removed all FCM related useEffect and functions from here.
-  // They are now handled centrally in App.js.
 
   return (
     <Stack.Navigator initialRouteName="Splash">
@@ -307,8 +178,7 @@ function HomeStack({ navigation }) {
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    // showRewardAd();
-                    showInterstitialAd();
+                    showInterstitialAd;
                     return isLogin
                       ? navigation.navigate('HomeStack', {
                           screen: 'Writeshayari',
@@ -346,6 +216,7 @@ function HomeStack({ navigation }) {
               theme={theme}
               title={route.params.title}
               type={route.params.type}
+              ads={showInterstitialAd}
             />
           ),
         })}
@@ -424,7 +295,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center', // Space between items
     paddingHorizontal: scale(10),
-    // paddingVertical: verticalScale(10),
+    paddingVertical: verticalScale(10),
     // elevation: 4,
   },
   iconLeft: {

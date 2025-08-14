@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
   ImageBackground,
   Dimensions,
   Share,
+  AppState,
 } from "react-native";
 import {
   DrawerContentScrollView,
@@ -25,6 +27,7 @@ import { fontScale, scale, scaleFont } from "./Responsive";
 import MyShayari from "./assets/myshayariicon.svg";
 import AtRateIcon from "./assets/atrate.svg";
 import LinearGradient from "react-native-linear-gradient";
+import { AppContext } from "./AppContext";
 
 const { width } = Dimensions.get("screen");
 
@@ -32,15 +35,48 @@ export default function CustomDrawerContent(props) {
   const { theme } = useTheme();
   const { user, logout, isLogin } = useContext(AuthContext);
   const navigation = useNavigation();
+  const { updateActionStatus } = useContext(AppContext);
+  const appState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", nextAppState => {
+      // If coming back to foreground
+      if (
+        appState.current.match(/background/) &&
+        nextAppState === "active"
+      ) {
+        updateActionStatus(false); // Reset after coming back
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => sub.remove();
+  }, []);
+
 
   const rateApp = () => {
-    Linking.openURL("market://details?id=com.HindiShayar").catch(console.error);
+    try {
+      updateActionStatus(true)
+      Linking.openURL("market://details?id=com.HindiShayar").catch(console.error);
+
+    } catch (error) {
+      console.log(error);
+
+    }
+    // finally {
+    //   updateActionStatus(false)
+    // }
   };
 
   const sendFeedbackMail = () => {
-    Linking.openURL(
-      "mailto:jhingurlab@gmail.com?subject=Feedback&body=Hi, I would like to share some feedback..."
-    );
+    try {
+      updateActionStatus(true)
+      Linking.openURL(
+        "mailto:jhingurlab@gmail.com?subject=Feedback&body=Hi, I would like to share some feedback..."
+      );
+    } catch (error) {
+
+    }
   };
 
   const handleLogout = () => {
@@ -50,19 +86,28 @@ export default function CustomDrawerContent(props) {
   };
 
   const shareApp = () => {
-    Share.share({
-      message: `📝✨ Feelings deserve the perfect words...
+    try {
+      updateActionStatus(true)
 
-📲 Download *Hindi Shayari Wale* — your daily dose of heart-touching Shayaris!
+      Share.share({
+        message: `📝✨ Feelings deserve the perfect words...
+  
+  📲 Download *Hindi Shayari Wale* — your daily dose of heart-touching Shayaris!
+  
+  💖 Love | 💔 Sad | 😍 Romantic | 😄 Funny | 🧠 Motivational | 💭 Yaad | 🌅 Morning & more!
+  
+  🎨 Customize backgrounds, fonts & colors  
+  🛄 Share Shayari as image or text with one tap!
+  
+  👇 Express yourself in style. Try it now!
+  🔗 https://play.google.com/store/apps/details?id=com.HindiShayari`,
+      });
+    } catch (error) {
+      console.log(error);
 
-💖 Love | 💔 Sad | 😍 Romantic | 😄 Funny | 🧠 Motivational | 💭 Yaad | 🌅 Morning & more!
-
-🎨 Customize backgrounds, fonts & colors  
-🛄 Share Shayari as image or text with one tap!
-
-👇 Express yourself in style. Try it now!
-🔗 https://play.google.com/store/apps/details?id=com.HindiShayari`,
-    });
+    } finally {
+      updateActionStatus(false)
+    }
   };
 
   return (
@@ -144,8 +189,16 @@ export default function CustomDrawerContent(props) {
         <DrawerMenuItem
           icon={<MaterialIcons name="flag" size={22} color={theme.text} />}
           label="Privacy Policy"
-          onPress={() =>
-            Linking.openURL("https://jhingurlab.blogspot.com/2025/08/privacy-policy.html")
+          onPress={() => {
+            try {
+              updateActionStatus(true)
+              Linking.openURL("https://jhingurlab.blogspot.com/2025/08/privacy-policy.html")
+
+            } catch (error) {
+              console.log(error);
+
+            }
+          }
           }
         />
         {user && (

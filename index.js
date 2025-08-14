@@ -1,9 +1,13 @@
-/**
- * @format
- */
-
+// index.js
 import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
+import { AppProvider } from './AppContext';
 
-AppRegistry.registerComponent(appName, () => App);
+const Root = () => (
+  <AppProvider>
+    <App />
+  </AppProvider>
+);
+
+AppRegistry.registerComponent(appName, () => Root);

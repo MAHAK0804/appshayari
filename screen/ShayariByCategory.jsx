@@ -39,6 +39,7 @@ import {
 import NativeCard from "../NativeCardAds";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { useInterstitialAd } from "../AdProvider";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 30;
@@ -74,29 +75,29 @@ export default function ShayariListScreen({ route }) {
   const [categoryClickCount, setCategoryClickCount] = useState(0);
   const [allshayari, setAllShayari] = useState([]);
   const { userId } = useContext(AuthContext);
-  const rewardedAdRef = useRef(null);
-  const [rewardLoaded, setRewardLoaded] = useState(false);
+  // const rewardedAdRef = useRef(null);
+  // const [rewardLoaded, setRewardLoaded] = useState(false);
 
-  const createAndLoadRewardedAd = () => {
-    const newAd = RewardedAd.createForAdRequest(TestIds.REWARDED, {
-      requestNonPersonalizedAdsOnly: true,
-    });
+  // const createAndLoadRewardedAd = () => {
+  //   const newAd = RewardedAd.createForAdRequest(TestIds.REWARDED, {
+  //     requestNonPersonalizedAdsOnly: true,
+  //   });
 
-    rewardedAdRef.current = newAd;
+  //   rewardedAdRef.current = newAd;
 
-    newAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
-      setRewardLoaded(true);
-      console.log("Rewarded ad loaded");
-    });
+  //   newAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
+  //     setRewardLoaded(true);
+  //     console.log("Rewarded ad loaded");
+  //   });
 
 
 
-    newAd.load();
-  };
+  //   newAd.load();
+  // };
 
-  useEffect(() => {
-    createAndLoadRewardedAd();
-  }, []);
+  // useEffect(() => {
+  //   createAndLoadRewardedAd();
+  // }, []);
 
 
   const fetchShayaris = useCallback(
@@ -271,50 +272,29 @@ export default function ShayariListScreen({ route }) {
       }
     }
   }, [selectedCategory, categories, type]);
-  const interstitialAdRef = useRef(null);
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
-
-  const createAndLoadInterstitialAd = () => {
-    const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-      requestNonPersonalizedAdsOnly: true,
-    });
-
-    interstitialAdRef.current = newAd;
-
-    newAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialLoaded(true);
-      console.log("Interstitial ad loaded");
-    });
-
-    newAd.addAdEventListener(AdEventType.CLOSED, () => {
-      // Reload a new ad when closed
-      setInterstitialLoaded(false);
-      createAndLoadInterstitialAd();
-    });
-
-    newAd.load();
-  };
-
+  // const { showAd } = useInterstitialAd()
+  const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
-    createAndLoadInterstitialAd();
+    initInterstital();
   }, []);
-
-  const showInterstitialAd = () => {
-    const ad = interstitialAdRef.current;
-    if (ad && interstitialLoaded) {
-      try {
-        ad.show();
-      } catch (error) {
-        console.warn("Failed to show interstitial ad:", error);
-        // Optionally try to reload the ad or proceed without showing
-        createAndLoadInterstitialAd();
-      }
-    } else {
-      console.log("Interstitial not ready, loading new one...");
-      createAndLoadInterstitialAd();
+  const initInterstital = async () => {
+    const interstitialAd = InterstitialAd.createForAdRequest(
+      TestIds.INTERSTITIAL,
+    );
+    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      setInterstitialAds(interstitialAd);
+      console.log('Interstital Ads Loaded');
+    });
+    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+      console.log('Interstital Ads closed');
+    });
+    interstitialAd.load();
+  };
+  const showInterstitialAd = async () => {
+    if (interstitialAds) {
+      await interstitialAds.show();
     }
   };
-
   // --- HANDLERS ---
 
   const handleLoadMore = () => {
@@ -335,13 +315,7 @@ export default function ShayariListScreen({ route }) {
     setCategoryClickCount((prev) => {
       const newCount = prev + 1;
       if (newCount % 3 === 0) {
-        if (interstitialLoaded) {
-
-          showInterstitialAd()
-        }
-        else {
-          newCount + 1;
-        }
+        showInterstitialAd;
       }
       return newCount;
     });
@@ -410,7 +384,7 @@ export default function ShayariListScreen({ route }) {
                   onFavoriteToggle={handleRemoveFromFavorites}
                   filteredShayaris={allshayari}
                   isCat={true}
-                  ads={showInterstitialAd}
+                // ads={showInterstitialAd}
                 />
               }
             </View>

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import {
   ActivityIndicator,
   StatusBar,
@@ -13,7 +13,12 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { MobileAds } from 'react-native-google-mobile-ads';
+import {
+  AdEventType,
+  InterstitialAd,
+  MobileAds,
+  TestIds,
+} from 'react-native-google-mobile-ads';
 // import { NavigationContainerRef } from '@react-navigation/native'; // Not needed if using useRef for navigationRef
 
 import { ThemeProvider } from './ThemeContext';
@@ -23,6 +28,8 @@ import { AuthProvider } from './AuthContext.js';
 import Toast from 'react-native-root-toast';
 import messaging from '@react-native-firebase/messaging';
 import { NativeModules } from 'react-native';
+import { AdProvider } from './AdProvider.js';
+import { AppContext, AppProvider } from './AppContext.js';
 const { KillApp } = NativeModules;
 // Ignore all log warnings for a cleaner console output during development
 LogBox.ignoreAllLogs();
@@ -45,15 +52,19 @@ const sendTokenToServer = async token => {
   }
 };
 export default function App() {
+  const { actionStatus } = useContext(AppContext);
+  console.log('action', actionStatus);
+
   useEffect(() => {
     const sub = AppState.addEventListener('change', state => {
-      if (state === 'background') {
+      if (state === 'background' && !actionStatus) {
         KillApp.killApp(); // native process kill
       }
     });
 
     return () => sub.remove();
-  }, []);
+  }, [actionStatus]);
+
   const [isReady, setIsReady] = useState(false);
   // Create a ref for the NavigationContainer within DrawerNavigation to allow
   // navigation outside of components rendered by NavigationContainer itself.
@@ -166,6 +177,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {/* <RewardAdProvider> */}
+      {/* <AdProvider> */}
       <ThemeProvider>
         <RootSiblingParent>
           <AuthProvider>
@@ -182,6 +194,7 @@ export default function App() {
           </AuthProvider>
         </RootSiblingParent>
       </ThemeProvider>
+      {/* </AdProvider> */}
       {/* </RewardAdProvider> */}
     </GestureHandlerRootView>
   );

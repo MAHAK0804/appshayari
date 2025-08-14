@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import CopyIcon from "./assets/copyBlack.svg";
 import TickIcon from "./assets/tick.svg";
 import FavIcon from "./assets/favouriteBlack.svg";
-import LikedIcon from "./assets/heart.svg";
+import LikedIcon from "./assets/filled heart icon.svg";
 import EditIcon from "./assets/editBlack.svg";
 import ShareIcon from "./assets/shareBlack.svg";
 // import ExpandIcon from "./assets/expandBlack.svg";
@@ -18,7 +18,9 @@ import Toast from "react-native-root-toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { useInterstitialAd } from "./AdProvider";
 import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+// import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 export default function ShayariCardActions({
   title,
@@ -32,67 +34,89 @@ export default function ShayariCardActions({
   isBg = false,
   isCat = false,
   isIcon = true,
-  ads
+  // ads
 }) {
   const [copied, setCopied] = useState(false);
   const [isFav, setIsFav] = useState(false);
+  // const { showAd } = useInterstitialAd();
 
-
+  const [interstitialAds, setInterstitialAds] = useState(null);
+  useEffect(() => {
+    initInterstital();
+  }, []);
+  const initInterstital = async () => {
+    const interstitialAd = InterstitialAd.createForAdRequest(
+      TestIds.INTERSTITIAL,
+    );
+    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      setInterstitialAds(interstitialAd);
+      console.log('Interstital Ads Loaded');
+    });
+    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+      console.log('Interstital Ads closed');
+    });
+    interstitialAd.load();
+  };
+  const showInterstitialAd = async () => {
+    if (interstitialAds) {
+      await interstitialAds.show();
+    }
+  };
 
 
   const navigation = useNavigation();
-  const interstitialAdRef = useRef(null);
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
+  // const interstitialAdRef = useRef(null);
+  // const [interstitialLoaded, setInterstitialLoaded] = useState(false);
 
-  const createAndLoadInterstitialAd = () => {
-    const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-      requestNonPersonalizedAdsOnly: true,
-    });
+  // const createAndLoadInterstitialAd = () => {
+  //   const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+  //     requestNonPersonalizedAdsOnly: true,
+  //   });
 
-    interstitialAdRef.current = newAd;
+  //   interstitialAdRef.current = newAd;
 
-    newAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialLoaded(true);
-      console.log("Interstitial ad loaded");
-    });
+  //   newAd.addAdEventListener(AdEventType.LOADED, () => {
+  //     setInterstitialLoaded(true);
+  //     console.log("Interstitial ad loaded");
+  //   });
 
-    newAd.addAdEventListener(AdEventType.CLOSED, () => {
-      // Reload a new ad when closed
-      setInterstitialLoaded(false);
-      createAndLoadInterstitialAd();
-    });
+  //   newAd.addAdEventListener(AdEventType.CLOSED, () => {
+  //     // Reload a new ad when closed
+  //     setInterstitialLoaded(false);
+  //     createAndLoadInterstitialAd();
+  //   });
 
-    newAd.load();
-  };
+  //   newAd.load();
+  // };
 
-  useEffect(() => {
-    createAndLoadInterstitialAd();
-  }, []);
+  // useEffect(() => {
+  //   createAndLoadInterstitialAd();
+  // }, []);
 
-  const showInterstitialAd = () => {
-    const ad = interstitialAdRef.current;
-    if (ad && interstitialLoaded) {
-      try {
-        ad.show();
-        navigation.navigate("HomeStack", {
-          screen: "ShayariEditScreen",
-          params: { shayari },
-        });
-      } catch (error) {
-        navigation.navigate("HomeStack", {
-          screen: "ShayariEditScreen",
-          params: { shayari },
-        });
-      }
-    } else {
-      console.log("Interstitial not ready, loading new one...");
-      navigation.navigate("HomeStack", {
-        screen: "ShayariEditScreen",
-        params: { shayari },
-      });
-      createAndLoadInterstitialAd();
-    }
-  };
+  // const showInterstitialAd = () => {
+  //   const ad = interstitialAdRef.current;
+  //   if (ad && interstitialLoaded) {
+  //     try {
+  //       ad.show();
+  //       navigation.navigate("HomeStack", {
+  //         screen: "ShayariEditScreen",
+  //         params: { shayari },
+  //       });
+  //     } catch (error) {
+  //       navigation.navigate("HomeStack", {
+  //         screen: "ShayariEditScreen",
+  //         params: { shayari },
+  //       });
+  //     }
+  //   } else {
+  //     console.log("Interstitial not ready, loading new one...");
+  //     navigation.navigate("HomeStack", {
+  //       screen: "ShayariEditScreen",
+  //       params: { shayari },
+  //     });
+  //     createAndLoadInterstitialAd();
+  //   }
+  // };
 
   useEffect(() => {
     checkIsFav();
@@ -154,15 +178,24 @@ export default function ShayariCardActions({
     }
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (title === "My Post Shayari") {
       navigation.navigate("Writeshayari", {
         shayari: shayari,
       });
     }
     else {
+      // if (isCat) {
+      //   showInterstitialAd();
+      // }
+      // else {
       if (isCat) {
-        showInterstitialAd();
+        await showInterstitialAd();
+        return navigation.navigate("HomeStack", {
+          screen: "ShayariEditScreen",
+          params: { shayari },
+        });
+
       }
       else {
 
@@ -171,6 +204,8 @@ export default function ShayariCardActions({
           params: { shayari },
         });
       }
+
+      // }
     }
   };
 

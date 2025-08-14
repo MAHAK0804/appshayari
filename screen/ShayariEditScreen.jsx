@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -10,6 +11,9 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Platform,
+  PermissionsAndroid,
+  ActivityIndicator,
 } from "react-native";
 
 import Feather from 'react-native-vector-icons/Feather';
@@ -32,13 +36,16 @@ import { fontScale, moderateScale, scale, scaleFont, verticalScale } from "../Re
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 import { launchImageLibrary } from "react-native-image-picker";
+import { AppContext } from "../AppContext";
+import axios from "axios";
+import FastImage from "react-native-fast-image";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 // Adjusted CARD_HEIGHT to take up more vertical space,
 // allowing more room for the shayari and preventing cutting.
 // This value can be fine-tuned further if needed based on device testing.
 const CARD_WIDTH = SCREEN_WIDTH - 20; // Increased padding on sides for better look
-const CARD_HEIGHT = SCREEN_HEIGHT * 0.472; // Increased from 0.479 to 0.6 for more height
+const CARD_HEIGHT = SCREEN_HEIGHT * 0.6; // Increased from 0.479 to 0.6 for more height
 
 export default function ShayariCardExact({ route }) {
   const [fontSize, setFontSize] = useState(23);
@@ -50,10 +57,9 @@ export default function ShayariCardExact({ route }) {
   const [showStyleOptions, setShowStyleOptions] = useState(false);
   const [fontColor, setFontColor] = useState("#000");
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState(
-    require("../assets/image_1.webp")
-  );
+  const [backgroundImage, setBackgroundImage] = useState(require("../assets/image_1.webp"))
 
+  // const DEFAULT_BG = { uri: "https://shayaripoetry.s3.ap-south-1.amazonaws.com/bgImages/image_1.webp" }
   const [favorites, setFavorites] = useState([]);
   const cardRef = useRef(null);
   const [showforSave, setshowforSave] = useState(true);
@@ -89,7 +95,8 @@ export default function ShayariCardExact({ route }) {
   }, []);
   const insets = useSafeAreaInsets();
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const { updateActionStatus } = useContext(AppContext);
   useEffect(() => {
     if (customAlertVisible) {
       setshowforSave(true);
@@ -97,24 +104,38 @@ export default function ShayariCardExact({ route }) {
     }
   }, [customAlertVisible]);
   const pickImageFromGallery = async () => {
-    const options = {
-      mediaType: 'photo',
-      includeBase64: false,
-    };
+    try {
+      updateActionStatus(true)
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else {
-        const selectedImage = { uri: response.assets[0].uri };
-        setBackgroundImage(selectedImage);
-        setBackgroundColor(null);
-        setShowBgPicker(false);
-      }
-    });
+
+      const options = {
+        mediaType: 'photo',
+        includeBase64: false,
+      };
+
+      launchImageLibrary(options, (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+          console.log('ImagePicker Error: ', response.errorMessage);
+        } else {
+          const selectedImage = { uri: response.assets[0].uri };
+          console.log("selected2", selectedImage);
+
+          setBackgroundImage(selectedImage);
+          setBackgroundColor(null);
+          setShowBgPicker(false);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+
+    }
+    finally {
+      updateActionStatus(false)
+    }
   };
+
 
   const menuItems = [
     { id: "1", name: "Fonts", iconName: "type", type: "image" },
@@ -139,6 +160,35 @@ export default function ShayariCardExact({ route }) {
     { name: "casual", label: "Casual" },
   ];
   const [isActive, setisActive] = useState(null);
+  // const [bgImages, setBgImages] = useState([]);
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   fetchBackgroundImages();
+  // }, []);
+  // const fetchBackgroundImages = async () => {
+  //   try {
+  //     const res = await axios.get("https://hindishayari.onrender.com/api/bg-images"); // Replace with your endpoint
+  //     console.log(res.data);
+
+  //     setBgImages(res.data); // Assuming data is an array of image URLs
+  //   } catch (err) {
+  //     console.error("Error fetching background images:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  // const preloadImages = (urls) => {
+  //   urls.forEach((url) => Image.prefetch(url));
+  // };
+  // useEffect(() => {
+  //   if (bgImages.length > 0) preloadImages(bgImages);
+  // }, [bgImages]);
+
+  // if (loading) {
+  //   return <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />;
+  // }
+  // const bgImages = 
   const handleItemPress = (itemName) => {
     setShowFontOptions(false);
     setShowStyleOptions(false);
@@ -236,14 +286,15 @@ export default function ShayariCardExact({ route }) {
           style={[
             styles.shayariCard, // Use the new style for the card
             backgroundColor && { backgroundColor },
-            { position: "absolute", top: -30 + insets.top, }
+            // { position: "absolute", top: -30 + insets.top, height: "70%" }
           ]}
           ref={cardRef}
           collapsable={false}
         >
           {/* Background Image with Opacity */}
           {backgroundImage && (
-            <Image
+            <FastImage
+              // key={backgroundImage?.uri}
               source={backgroundImage}
               style={[
                 StyleSheet.absoluteFillObject,
@@ -351,7 +402,7 @@ export default function ShayariCardExact({ route }) {
                   <Text
                     style={{
                       fontFamily: font.name,
-                      fontSize: fontScale * scaleFont(16),
+                      fontSize: fontScale * scaleFont(15),
                       color: fontFamily === font.name ? "#000" : "#fff",
                     }}
                   >
@@ -372,8 +423,8 @@ export default function ShayariCardExact({ route }) {
                 style={{
                   flexDirection: "row",
                   justifyContent: "center",
-                  marginTop: 10,
-                  paddingVertical: 5,
+                  // marginTop: 10,
+                  // paddingVertical: 5,
                 }}
               >
                 {/* Regular */}
@@ -479,22 +530,11 @@ export default function ShayariCardExact({ route }) {
                 </TouchableOpacity>
 
                 {/* Predefined background images */}
-                {[
-                  require("../assets/bg1.webp"),
-                  require("../assets/bg2.webp"),
-                  require("../assets/bg3.webp"),
-                  require("../assets/bg4.webp"),
-                  require("../assets/bg5.webp"),
-                  require("../assets/bg6.webp"),
-                  require("../assets/bg7.webp"),
-                  require("../assets/bg8.webp"),
-                  require("../assets/bg9.webp"),
-                  require("../assets/bg10.webp"),
-                  require("../assets/bg11.webp"),
-                  require("../assets/bg12.webp"),
-                  require("../assets/bg13.webp"),
-                  require("../assets/bg14.webp"),
-                ].map((img, index) => {
+                {[require("../assets/bg1.webp"),
+                require("../assets/bg2.webp"),
+                require("../assets/bg3.webp"),
+                require("../assets/bg4.webp"),
+                require("../assets/bg5.webp"), require("../assets/bg6.webp"), require("../assets/bg7.webp"), require("../assets/bg8.webp"), require("../assets/bg9.webp"), require("../assets/bg10.webp"), require("../assets/bg11.webp"), require("../assets/bg12.webp"), require("../assets/bg13.webp"), require("../assets/bg14.webp"), require("../assets/bg16.webp"), require("../assets/bg17.webp"), require("../assets/bg18.webp"), require("../assets/bg19.webp"), require("../assets/bg20.webp"), require("../assets/bg21.webp"), require("../assets/bg22.webp"), require("../assets/bg24.webp"), require("../assets/bg25.webp"), require("../assets/bg26.webp"), require("../assets/bg27.webp"), require("../assets/bg28.webp"), require("../assets/bg29.webp"), require("../assets/bg31.webp"), require("../assets/bg32.webp")].map((img, index) => {
                   return (
                     <TouchableOpacity
                       key={index}
@@ -504,12 +544,13 @@ export default function ShayariCardExact({ route }) {
                       }}
                       style={styles.bgImageOption}
                     >
-                      <Image
+                      <FastImage
                         source={img}
                         style={{
                           width: 80,
                           height: 80,
                         }}
+                        resizeMode={FastImage.resizeMode.cover}
                       />
                     </TouchableOpacity>
                   )
@@ -642,13 +683,14 @@ const styles = StyleSheet.create({
   shayariCard: {
     // flex: 1,
     width: CARD_WIDTH,
-    // height: CARD_HEIGHT,
+    height: CARD_HEIGHT,
     borderRadius: 12,
     overflow: 'hidden', // Ensures content respects border radius
     // marginBottom: 20, // Space between card and grid menu
-    paddingTop: verticalScale(30)
+    // paddingTop: verticalScale(30)
   },
   innerRow: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -776,11 +818,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   fontItem: {
-    marginVertical: 10,
-    paddingVertical: 8,
+    marginVertical: verticalScale(8),
+    paddingVertical: 3,
     paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: "#fff",
+    // borderWidth: 1,
+    // borderColor: "#fff",
     marginHorizontal: 5,
     borderRadius: 20,
     justifyContent: "center",
@@ -789,7 +831,7 @@ const styles = StyleSheet.create({
   fontItemSelected: {
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 15,
     color: "#fff",
     backgroundColor: "#fff",

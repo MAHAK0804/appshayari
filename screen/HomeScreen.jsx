@@ -64,6 +64,7 @@ import PostSlider from "../PostSlider";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Share from "react-native-share";
+import { AppContext } from "../AppContext";
 const { width } = Dimensions.get("screen");
 const numColumns = 3;
 const cardSize = width / numColumns - 25;
@@ -72,6 +73,8 @@ const CARD_HEIGHT = Dimensions.get("screen").height - scale(550);
 const bgColors = ["#364149", "#ffffff", "#393649", "#493645", "#213550"];
 
 const HomeScreen = () => {
+  const { updateActionStatus } = useContext(AppContext);
+
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const navigation = useNavigation();
@@ -96,44 +99,28 @@ const HomeScreen = () => {
   // --- NEW STATE FOR EXIT POPUP ---
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
-  const interstitialAdRef = useRef(null);
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
-
-  const createAndLoadInterstitialAd = () => {
-    const newAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-      requestNonPersonalizedAdsOnly: true,
-    });
-
-    interstitialAdRef.current = newAd;
-
-    newAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialLoaded(true);
-      console.log("Interstitial ad loaded");
-    });
-
-    newAd.addAdEventListener(AdEventType.CLOSED, () => {
-      // Reload a new ad when closed
-      setInterstitialLoaded(false);
-      createAndLoadInterstitialAd();
-    });
-
-    newAd.load();
-  };
-
+  const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
-    createAndLoadInterstitialAd();
+    initInterstital();
   }, []);
-
-  const showInterstitialAd = () => {
-    const ad = interstitialAdRef.current;
-    if (ad && interstitialLoaded) {
-      ad.show();
-    } else {
-      console.log("Interstitial not ready, loading new one...");
-      createAndLoadInterstitialAd();
+  const initInterstital = async () => {
+    const interstitialAd = InterstitialAd.createForAdRequest(
+      TestIds.INTERSTITIAL,
+    );
+    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      setInterstitialAds(interstitialAd);
+      console.log('Interstital Ads Loaded');
+    });
+    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+      console.log('Interstital Ads closed');
+    });
+    interstitialAd.load();
+  };
+  const showInterstitialAd = async () => {
+    if (interstitialAds) {
+      await interstitialAds.show();
     }
   };
-
 
   const fetchShayaris = useCallback(
     async (pageNum) => {
@@ -157,6 +144,7 @@ const HomeScreen = () => {
     },
     [hasMore, isFetchingMore]
   );
+  console.log("shayar", shayaris.length);
 
   const getSpotlightShayaris = useCallback(async () => {
     try {
@@ -273,6 +261,8 @@ const HomeScreen = () => {
   const shareAsImage = async () => {
     if (!captureViewRef.current) return;
     try {
+      updateActionStatus(true)
+
       const uri = await captureRef(captureViewRef.current, {
         format: "png",
         quality: 1,
@@ -288,6 +278,7 @@ const HomeScreen = () => {
       Toast.show("Failed to share as image.");
     } finally {
       setCustomShareModalVisible(false);
+      updateActionStatus(false)
     }
   };
 
@@ -321,15 +312,26 @@ const HomeScreen = () => {
     }
   };
   const handleExpand = (title, shayari, filteredShayaris) => {
-    return navigation.navigate("HomeStack", {
-      screen: "ShayariFullView",
-      params: {
-        title,
-        shayariList: filteredShayaris,
-        shayari,
-        initialIndex: filteredShayaris.findIndex((s) => s._id === shayari._id),
-      },
-    });
+    (async () => {
+      try {
+        const res = await axios.get(`https://hindishayari.onrender.com/api/shayaris`);
+        const fetchedShayaris = res.data.shayaris;
+
+        return navigation.navigate("HomeStack", {
+          screen: "ShayariFullView",
+          params: {
+            title,
+            shayariList: fetchedShayaris,
+            shayari,
+            initialIndex: fetchedShayaris.findIndex((s) => s._id === shayari._id),
+          },
+        });
+
+      } catch (error) {
+        console.error("SplashScreen: Error fetching shayaris ->", error);
+      }
+    })();
+
   };
 
   const quickLinks = useMemo(
@@ -363,10 +365,12 @@ const HomeScreen = () => {
         </Text>
       </View>
     ),
-    [navigation, theme.card, theme.text, showInterstitialAd]
+    [navigation, theme.card, theme.text]
   );
 
   const ShayariCard = React.memo(({ item, index }) => {
+    console.log("most ", item);
+
     const backgroundColor = bgColors[index % bgColors.length];
     const textColor = backgroundColor === "#ffffff" ? "#111" : "#fff";
     const isFavorite = favorites.some((fav) => fav._id === item._id);
@@ -470,10 +474,10 @@ const HomeScreen = () => {
               <Text style={styles.writeHeading}>की ज़ुबान में</Text>
               <TouchableOpacity
                 style={styles.writeButton}
-                onPress={() => {
-                  showInterstitialAd();
+                onPress={async () => {
+                  await showInterstitialAd;
 
-                  navigation.navigate(isLogin ? "Writeshayari" : "LoginScreen");
+                  return navigation.navigate(isLogin ? "Writeshayari" : "LoginScreen");
                 }}
               >
                 <View style={styles.iconWrapper}>
@@ -590,8 +594,18 @@ const HomeScreen = () => {
               <NativeCard />
               <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.shareButton} onPress={() => {
-                  Share.open({ message: selectedShayari?.text.replace(/\\n/g, "\n") });
-                  setCustomShareModalVisible(false);
+                  try {
+                    updateActionStatus(true)
+                    Share.open({ message: selectedShayari?.text.replace(/\\n/g, "\n") });
+                  } catch (error) {
+                    console.log(error);
+
+                  }
+                  finally {
+                    updateActionStatus(false)
+                    setCustomShareModalVisible(false);
+                  }
+
                 }}>
                   <TextIcon width={16} height={20} fill="#fff" />
                   <Text style={styles.shareButtonText}>Share Text</Text>

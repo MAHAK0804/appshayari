@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Platform, PermissionsAndroid, Alert } from "react-native";
 import TextIcon from "./assets/text.svg";
 import { captureRef } from "react-native-view-shot";
@@ -11,6 +11,7 @@ import NativeCard from "./NativeCardAds";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Toast from "react-native-root-toast";
 import Share from 'react-native-share';
+import { AppContext } from "./AppContext";
 
 export default function CustomShareModal({
   visible,
@@ -19,6 +20,7 @@ export default function CustomShareModal({
   shayari,
 }) {
   console.log("shayari", shayari);
+  const { updateActionStatus } = useContext(AppContext);
 
   if (!visible) return null;
 
@@ -29,11 +31,14 @@ export default function CustomShareModal({
 
       // Toast.show(uri)
       console.log("uri", uri);
-
+      updateActionStatus(true)
       await Share.open({ url: uri });
     } catch (error) {
       console.error("Failed to share image with text", error);
       Toast.show("Failed to share as image.");
+    }
+    finally {
+      updateActionStatus(false);
     }
   };
   const saveToGallery = async () => {
@@ -90,11 +95,20 @@ export default function CustomShareModal({
           <TouchableOpacity
             style={[styles.shareButton, { gap: 7 }]}
             onPress={() => {
+              try {
+                updateActionStatus(true)
+                Share.open({
+                  message: shayari?.text.replace(/\\n/g, "\n"),
+                });
+              } catch (error) {
+                console.log(error);
 
-              Share.open({
-                message: shayari?.text.replace(/\\n/g, "\n"),
-              });
-              onClose();
+              } finally {
+                onClose();
+
+                updateActionStatus(false)
+              }
+
             }}
           >
             <TextIcon width={16} height={20} fill="#000" />

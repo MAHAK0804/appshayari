@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   background: { flex: 1, backgroundColor: "#08041C" },
   container: { paddingHorizontal: 24, paddingVertical: 20 },
-  backButton: { padding: 24, marginVertical: verticalScale(10) },
+  backButton: { padding: 24, },
   backIcon: { fontSize: fontScale * scaleFont(34), color: "#fff" },
   title: {
     fontSize: fontScale * scaleFont(30),

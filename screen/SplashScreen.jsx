@@ -2,8 +2,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Image, ActivityIndicator, Text } from "react-native";
+import { View, StyleSheet, Image, ActivityIndicator, Text, AppState, NativeModules } from "react-native";
 import messaging from '@react-native-firebase/messaging';
+const { KillApp } = NativeModules;
 
 const SplashScreen = ({ navigation }) => {
     const [loadingData, setLoadingData] = useState(false);
@@ -19,7 +20,9 @@ const SplashScreen = ({ navigation }) => {
                     'Notification opened app from quit/background state:',
                     remoteMessage.data
                 );
+
                 setInitialNoti(remoteMessage);
+
             }
 
             // 2. Foreground notifications
@@ -34,6 +37,7 @@ const SplashScreen = ({ navigation }) => {
                         'Notification opened app from background state:',
                         remoteMessage.data
                     );
+
                     setInitialNoti(remoteMessage);
                 });
 

@@ -42,6 +42,7 @@ const CARD_HEIGHT = SCREEN_HEIGHT - scale(240);
 export default function ShayariFullViewScreen({ route }) {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  console.log("full view ", route.params.shayariList.length);
 
   const [favorites, setFavorites] = useState([]);
   const [copiedId, setCopiedId] = useState(null);
@@ -180,13 +181,13 @@ export default function ShayariFullViewScreen({ route }) {
         message={alertMessage}
         onClose={() => setCustomAlertVisible(false)}
       />
-      <View style={styles.cardRow}>
+      <View style={[styles.cardRow, { flex: 1 }]}>
         <View ref={cardRef} collapsable={false}>
           <ImageBackground
             source={require("../assets/image_1.webp")}
             style={[
-              styles.backgroundCard,
-              { width: CARD_WIDTH, height: CARD_HEIGHT },
+
+              { width: CARD_WIDTH, flex: 1 },
             ]}
             imageStyle={styles.imageBorder}
             resizeMode="cover"
@@ -249,7 +250,17 @@ export default function ShayariFullViewScreen({ route }) {
         </View>
       )}
 
-      <View style={styles.actionsDark}>
+      <View style={[{
+        width: "100%",
+        position: "absolute", bottom: 60 + insets.bottom, flexDirection: "row",
+        justifyContent: "space-around",
+        paddingVertical: 10,
+        paddingHorizontal: 9,
+        backgroundColor: "#191734",
+        borderTopWidth: 0,
+        // borderBottomLeftRadius: 20,
+        // borderBottomRightRadius: 20,
+      }]}>
         <TouchableOpacity onPress={handleCopy}>
           {isCopied ? (
             <TickIcon width={40} height={40} />
@@ -296,7 +307,7 @@ export default function ShayariFullViewScreen({ route }) {
         onClose={() => setCustomShareModalVisible(false)}
         cardRef={cardRef}
       />
-      <View style={{ position: 'absolute', bottom: insets.bottom, left: 0, right: 0 }}>
+      <View style={{ position: 'absolute', bottom: insets.bottom, left: 0, right: 0, backgroundColor: "#000" }}>
         <BannerAd
           unitId={TestIds.BANNER}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}

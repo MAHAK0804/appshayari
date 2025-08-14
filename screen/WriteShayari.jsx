@@ -39,6 +39,7 @@ import { fontScale, moderateScale, scale, scaleFont, verticalScale } from "../Re
 import NativeCard from "../NativeCardAds";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { AppContext } from "../AppContext";
 
 export default function WriteShayari({ route }) {
   const { shayari = {} } = route?.params || {};
@@ -72,6 +73,7 @@ export default function WriteShayari({ route }) {
   const [placeholderText] = useState(
     "Tap here to write your shayari...\n\nExpress your thoughts,\nShare your feelings,\nCreate something beautiful."
   );
+  const { updateActionStatus } = useContext(AppContext);
 
   const [customShareModalVisible, setCustomShareModalVisible] = useState(false);
   const [selectedCardRef, setSelectedCardRef] = useState(null);
@@ -186,8 +188,8 @@ export default function WriteShayari({ route }) {
 
   const shareAsImage = async (uri) => {
     // if (!cardRef.current) return;
-
     try {
+      updateActionStatus(true)
 
       // Toast.show(uri)
       console.log("uri", uri);
@@ -196,6 +198,8 @@ export default function WriteShayari({ route }) {
     } catch (error) {
       console.error("Failed to share image with text", error);
       Toast.show("Failed to share as image.");
+    } finally {
+      updateActionStatus(false)
     }
   };
   const saveToGallery = async () => {
@@ -399,10 +403,21 @@ export default function WriteShayari({ route }) {
                   <TouchableOpacity
                     style={styles.shareButton}
                     onPress={() => {
-                      Share.open({
-                        message: shayariText.replace(/\\n/g, "\n"),
-                      });
-                      setCustomShareModalVisible(false);
+                      try {
+                        updateActionStatus(true)
+                        Share.open({
+                          message: shayariText.replace(/\\n/g, "\n"),
+                        });
+                      } catch (error) {
+                        console.log(error);
+
+                      }
+                      finally {
+
+                        setCustomShareModalVisible(false);
+                        updateActionStatus(false)
+                      }
+
                     }}
                   >
                     <WhiteText width={18} height={18} />
