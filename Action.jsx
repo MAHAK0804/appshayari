@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, NativeModules } from "react-native";
 import CopyIcon from "./assets/copyBlack.svg";
 import TickIcon from "./assets/tick.svg";
 import FavIcon from "./assets/favouriteBlack.svg";
@@ -18,7 +18,7 @@ import Toast from "react-native-root-toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useInterstitialAd } from "./AdProvider";
+// import { useInterstitialAd } from "./AdProvider";
 import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 // import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
@@ -39,14 +39,17 @@ export default function ShayariCardActions({
   const [copied, setCopied] = useState(false);
   const [isFav, setIsFav] = useState(false);
   // const { showAd } = useInterstitialAd();
+  const { AdConstants } = NativeModules;
+  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
   const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
     initInterstital();
   }, []);
   const initInterstital = async () => {
     const interstitialAd = InterstitialAd.createForAdRequest(
-      TestIds.INTERSTITIAL,
+      adUnitId
     );
     interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       setInterstitialAds(interstitialAd);

@@ -16,6 +16,7 @@ import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
+  NativeModules,
 } from "react-native";
 import { AuthContext } from "../AuthContext";
 import { fontScale, scaleFont, verticalScale } from "../Responsive";
@@ -25,7 +26,10 @@ import { AppContext } from '../AppContext';
 
 export default function VerifyOTPScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -234,7 +238,7 @@ export default function VerifyOTPScreen({ navigation, route }) {
       </View>
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0, alignItems: 'center' }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />

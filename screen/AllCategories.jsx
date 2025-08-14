@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
+  NativeModules,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../ThemeContext";
@@ -23,6 +24,10 @@ const numColumns = 3;
 const cardSize = width / numColumns - 20;
 
 export default function AllCategories() {
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const { theme } = useTheme();
   const navigation = useNavigation();
   const [categories, setCategories] = useState([]);
@@ -101,7 +106,7 @@ export default function AllCategories() {
       </ScrollView>
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0, alignItems: 'center' }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />

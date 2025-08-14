@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import {
     Text,
@@ -7,6 +8,7 @@ import {
     TouchableOpacity,
     Linking,
     ActivityIndicator,
+    NativeModules,
 } from 'react-native';
 import {
     NativeAd,
@@ -18,13 +20,16 @@ import {
 export default function NativeCard() {
     const [nativeAd, setNativeAd] = useState(null);
     const [loading, setLoading] = useState(true); // 🔄 Add loading state
+    const { AdConstants } = NativeModules;
+    console.log("Native Ad ID:", JSON.stringify(AdConstants.NATIVE_AD_UNIT_ID));
 
+    const adUnitId = __DEV__ ? TestIds.NATIVE : AdConstants.NATIVE_AD_UNIT_ID
     useEffect(() => {
         MobileAds().initialize();
 
         const loadAd = async () => {
             try {
-                const ad = await NativeAd.createForAdRequest(TestIds.NATIVE);
+                const ad = await NativeAd.createForAdRequest(adUnitId);
                 setNativeAd(ad);
             } catch (e) {
                 console.error('Failed to load ad:', e);

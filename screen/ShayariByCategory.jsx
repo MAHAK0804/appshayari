@@ -19,6 +19,7 @@ import {
   ImageBackground,
   Dimensions,
   Alert,
+  NativeModules,
 } from "react-native";
 import { useTheme } from "../ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -53,7 +54,13 @@ const ITEMS_PER_PAGE = 12;
 
 export default function ShayariListScreen({ route }) {
   const navigation = useNavigation();
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
+  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+
+  const adUnitId2 = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
   const cardRefs = useRef({});
   const insets = useSafeAreaInsets();
   const { type } = route.params || {};
@@ -279,7 +286,7 @@ export default function ShayariListScreen({ route }) {
   }, []);
   const initInterstital = async () => {
     const interstitialAd = InterstitialAd.createForAdRequest(
-      TestIds.INTERSTITIAL,
+      adUnitId2
     );
     interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       setInterstitialAds(interstitialAd);
@@ -484,7 +491,7 @@ export default function ShayariListScreen({ route }) {
 
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0 }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,

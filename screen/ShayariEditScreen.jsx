@@ -14,6 +14,7 @@ import {
   Platform,
   PermissionsAndroid,
   ActivityIndicator,
+  NativeModules,
 } from "react-native";
 
 import Feather from 'react-native-vector-icons/Feather';
@@ -58,7 +59,10 @@ export default function ShayariCardExact({ route }) {
   const [fontColor, setFontColor] = useState("#000");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(require("../assets/image_1.webp"))
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   // const DEFAULT_BG = { uri: "https://shayaripoetry.s3.ap-south-1.amazonaws.com/bgImages/image_1.webp" }
   const [favorites, setFavorites] = useState([]);
   const cardRef = useRef(null);
@@ -637,7 +641,7 @@ export default function ShayariCardExact({ route }) {
       {/* Banner Ad */}
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0, alignItems: 'center', backgroundColor: "#08041C" }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />

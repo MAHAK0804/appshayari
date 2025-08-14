@@ -49,6 +49,8 @@ export default function CustomShareModal({
         : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
       const hasPermission = await PermissionsAndroid.check(permission);
+      console.log("per", hasPermission);
+
 
       if (!hasPermission) {
         const result = await PermissionsAndroid.request(permission);

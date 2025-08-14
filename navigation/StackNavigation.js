@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable react-native/no-inline-styles */
 // /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
@@ -10,6 +11,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  NativeModules,
 } from 'react-native';
 // import Ionicons from 'react-native-vector-icons/Ionicons'; // Keep if used in CustomDrawerContent
 
@@ -110,14 +112,22 @@ const CustomEditHeader = ({ theme, title, type, ads }) => {
 function HomeStack({ navigation }) {
   const { theme } = useTheme();
   const { isLogin } = useContext(AuthContext);
+  // INTERSTITIAL_AD_UNIT_ID;
+  const { AdConstants } = NativeModules;
+  console.log(
+    'Native Ad ID:',
+    JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID),
+  );
+
+  const adUnitId = __DEV__
+    ? TestIds.INTERSTITIAL
+    : AdConstants.INTERSTITIAL_AD_UNIT_ID;
   const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
     initInterstital();
   }, []);
   const initInterstital = async () => {
-    const interstitialAd = InterstitialAd.createForAdRequest(
-      TestIds.INTERSTITIAL,
-    );
+    const interstitialAd = InterstitialAd.createForAdRequest(adUnitId);
     interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       setInterstitialAds(interstitialAd);
       console.log('Interstital Ads Loaded');

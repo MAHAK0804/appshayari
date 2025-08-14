@@ -11,6 +11,7 @@ import {
   Dimensions,
   ImageBackground,
   FlatList,
+  NativeModules,
 } from "react-native";
 import Toast from "react-native-root-toast";
 import Animated, {
@@ -43,7 +44,10 @@ export default function ShayariFullViewScreen({ route }) {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   console.log("full view ", route.params.shayariList.length);
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const [favorites, setFavorites] = useState([]);
   const [copiedId, setCopiedId] = useState(null);
   const [customAlertVisible, setCustomAlertVisible] = useState(false);
@@ -309,7 +313,7 @@ export default function ShayariFullViewScreen({ route }) {
       />
       <View style={{ position: 'absolute', bottom: insets.bottom, left: 0, right: 0, backgroundColor: "#000" }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,

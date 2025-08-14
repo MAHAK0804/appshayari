@@ -12,6 +12,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  NativeModules,
   // CheckBox,
 } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -23,7 +24,10 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const navigation = useNavigation();
   const formik = useFormik({
     initialValues: {
@@ -162,7 +166,7 @@ export default function LoginScreen() {
       </View>
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0, alignItems: 'center' }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />

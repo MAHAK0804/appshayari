@@ -22,6 +22,7 @@ import {
   BackHandler,
   Platform,
   PermissionsAndroid,
+  NativeModules,
   // Import BackHandler
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -94,18 +95,23 @@ const HomeScreen = () => {
   const [selectedColors, setSelectedColors] = useState({ bg: "#fff" });
   const captureViewRef = useRef();
   const pageSize = 1000;
+  const { AdConstants } = NativeModules;
+  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
+  const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
 
   // --- NEW STATE FOR EXIT POPUP ---
   const [exitModalVisible, setExitModalVisible] = useState(false);
+  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
 
+  const adUnitId2 = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
   const [interstitialAds, setInterstitialAds] = useState(null);
   useEffect(() => {
     initInterstital();
   }, []);
   const initInterstital = async () => {
     const interstitialAd = InterstitialAd.createForAdRequest(
-      TestIds.INTERSTITIAL,
+      adUnitId2
     );
     interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       setInterstitialAds(interstitialAd);
@@ -577,7 +583,7 @@ const HomeScreen = () => {
       {/* Banner Ad at the bottom */}
       <View style={{ position: "absolute", bottom: insets.bottom, left: 0, right: 0, alignItems: 'center' }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />
