@@ -197,6 +197,7 @@ const HomeScreen = () => {
       console.log("Failed to save favorites", error);
     }
   };
+  console.log("favourtite", favorites);
 
   useFocusEffect(
     useCallback(() => {
@@ -222,9 +223,13 @@ const HomeScreen = () => {
   const toggleFavorite = useCallback(
     (shayari) => {
       const isFav = favorites.some((item) => item._id === shayari._id);
+      console.log("isFav", isFav);
+
       const updated = isFav
         ? favorites.filter((item) => item._id !== shayari._id)
         : [...favorites, shayari];
+      console.log("updated", updated);
+
       saveFavorites(updated);
       Toast.show(isFav ? "Removed from Favorites" : "Added to Favorites", {
         duration: Toast.durations.SHORT,
@@ -284,6 +289,7 @@ const HomeScreen = () => {
 
   const saveToGallery = async () => {
     try {
+      updateActionStatus(true)
       const permission = Platform.Version >= 33
         ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
         : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
@@ -303,12 +309,14 @@ const HomeScreen = () => {
         quality: 1,
       });
 
-      await CameraRoll.save(uri, { type: 'photo' });
+      await CameraRoll.saveToCameraRoll(uri, { type: 'photo' });
       Toast.show('Image saved to gallery!');
       setCustomShareModalVisible(false)
     } catch (error) {
       console.error('Error saving image:', error);
       Toast.show('Failed to save image.');
+    } finally {
+      updateActionStatus(false)
     }
   };
   const handleExpand = (title, shayari, filteredShayaris) => {
@@ -374,6 +382,8 @@ const HomeScreen = () => {
     const backgroundColor = bgColors[index % bgColors.length];
     const textColor = backgroundColor === "#ffffff" ? "#111" : "#fff";
     const isFavorite = favorites.some((fav) => fav._id === item._id);
+    console.log("shayariCard Fav", isFavorite);
+
     const isCopied = copiedId === item._id;
     return (
       <TouchableOpacity onPress={() => handleExpand("Most Loved Shaayris", item, shayaris)}>

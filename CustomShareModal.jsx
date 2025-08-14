@@ -43,6 +43,7 @@ export default function CustomShareModal({
   };
   const saveToGallery = async () => {
     try {
+      updateActionStatus(true)
       const permission = Platform.Version >= 33
         ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
         : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
@@ -67,6 +68,8 @@ export default function CustomShareModal({
     } catch (error) {
       console.error('Error saving image:', error);
       Toast.show('Failed to save image.');
+    } finally {
+      updateActionStatus(false)
     }
   };
 

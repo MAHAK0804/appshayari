@@ -21,6 +21,7 @@ import { AuthContext } from "../AuthContext";
 import { fontScale, scaleFont, verticalScale } from "../Responsive";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
+import { AppContext } from '../AppContext';
 
 export default function VerifyOTPScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -36,7 +37,10 @@ export default function VerifyOTPScreen({ navigation, route }) {
   const { login } = useContext(AuthContext);
 
   const inputs = Array.from({ length: 6 }, () => useRef(null));
-
+  const { updateActionStatus } = useContext(AppContext);
+  useEffect(() => {
+    updateActionStatus(true)
+  }, [])
   useEffect(() => {
     const loadSavedOtp = async () => {
       if (route.params.phone) {
@@ -117,6 +121,7 @@ export default function VerifyOTPScreen({ navigation, route }) {
           phone: route.params.phone,
         };
         await login(res.data.userId, userData);
+        updateActionStatus(false)
         navigation.replace("Writeshayari");
       } else {
         Alert.alert("Invalid OTP");
