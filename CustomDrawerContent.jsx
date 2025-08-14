@@ -57,7 +57,7 @@ export default function CustomDrawerContent(props) {
   const rateApp = () => {
     try {
       updateActionStatus(true)
-      Linking.openURL("market://details?id=com.HindiShayar").catch(console.error);
+      Linking.openURL("market://details?id=com.shayariapp").catch(console.error);
 
     } catch (error) {
       console.log(error);
@@ -90,17 +90,11 @@ export default function CustomDrawerContent(props) {
       updateActionStatus(true)
 
       Share.share({
-        message: `📝✨ Feelings deserve the perfect words...
-  
-  📲 Download *Hindi Shayari Wale* — your daily dose of heart-touching Shayaris!
-  
-  💖 Love | 💔 Sad | 😍 Romantic | 😄 Funny | 🧠 Motivational | 💭 Yaad | 🌅 Morning & more!
-  
-  🎨 Customize backgrounds, fonts & colors  
-  🛄 Share Shayari as image or text with one tap!
-  
-  👇 Express yourself in style. Try it now!
-  🔗 https://play.google.com/store/apps/details?id=com.HindiShayari`,
+        message: `💖 Love. 💔 Sad. 😄 Funny. 🧠 Motivational. 
+🎯All in one app — Hindi Shayari Lok!
+📲 Share your mood in style — text or image, with just one tap.
+
+  🔗 https://play.google.com/store/apps/details?id=com.shayariapp`,
       });
     } catch (error) {
       console.log(error);
