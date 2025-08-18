@@ -2,6 +2,7 @@
   "name": "shayariApp",
   "displayName": "shayariApp",
   "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-9762222984677056~3310100092"
+    "android_app_id": "ca-app-pub-4956722788728982~9998731137",
+          "androidAppId": "ca-app-pub-4956722788728982~9998731137"
   }
 }
