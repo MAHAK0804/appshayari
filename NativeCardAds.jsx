@@ -23,9 +23,7 @@ export default function NativeCard() {
     const { AdConstants } = NativeModules;
     console.log("Native Ad ID:", JSON.stringify(AdConstants.NATIVE_AD_UNIT_ID));
 
-    const adUnitId =TestIds.NATIVE
-    // console.log(adUnitId) ;
-
+    const adUnitId = __DEV__ ? TestIds.NATIVE : AdConstants.NATIVE_AD_UNIT_ID
     useEffect(() => {
         MobileAds().initialize();
 
