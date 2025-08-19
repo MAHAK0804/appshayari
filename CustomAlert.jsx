@@ -12,7 +12,7 @@ import { scaleFont } from "./Responsive";
 import { useNavigation } from "@react-navigation/native";
 
 export default function CustomAlert({ visible, title, message, onClose }) {
-  console.log(visible);
+  // //console.log(visible);
 
   if (!visible) return null;
   const navigation = useNavigation();

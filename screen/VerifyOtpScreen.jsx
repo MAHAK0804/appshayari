@@ -27,7 +27,7 @@ import { AppContext } from '../AppContext';
 export default function VerifyOTPScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -131,7 +131,7 @@ export default function VerifyOTPScreen({ navigation, route }) {
         Alert.alert("Invalid OTP");
       }
     } catch (error) {
-      console.log("OTP Verify Error:", error);
+      //console.log("OTP Verify Error:", error);
       Alert.alert("Verification failed. Please try again.");
     } finally {
       setLoading(false);
@@ -162,7 +162,7 @@ export default function VerifyOTPScreen({ navigation, route }) {
         Alert.alert("OTP sent to your phone.");
       }
     } catch (error) {
-      console.log("Resend OTP Error:", error.message);
+      //console.log("Resend OTP Error:", error.message);
       Alert.alert("Failed to resend OTP.");
     } finally {
       setLoading2(false);

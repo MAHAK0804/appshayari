@@ -36,22 +36,24 @@ import MenuBar from '../assets/MENU BAR.svg'; // SVG import
 import BackArrow from '../assets/left arrow.svg'; // SVG import
 // import { useRewardAd } from '../RewardContext'; // Keep if you uncomment later
 import SplashScreen from '../screen/SplashScreen';
-import {
-  AdEventType,
-  InterstitialAd,
-  TestIds,
-} from 'react-native-google-mobile-ads';
+import useInterstitial from '../Ads';
+// import {
+//   AdEventType,
+//   InterstitialAd,
+//   TestIds,
+// } from 'react-native-google-mobile-ads';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
-const CustomEditHeader = ({ theme, title, type, ads }) => {
+const CustomEditHeader = ({ theme, title, type }) => {
   const navigation = useNavigation();
   const { isLogin } = useContext(AuthContext);
   // const { showRewardAd } = useRewardAd();
+  const { show } = useInterstitial();
 
   const handleBackPress = () => {
-    ads;
+    show();
     // Define the navigation logic you want to run after the ad closes
     navigation.navigate('Home');
 
@@ -67,7 +69,11 @@ const CustomEditHeader = ({ theme, title, type, ads }) => {
 
               handleBackPress();
               // Removed navigation.goBack() here as showInterstitialAd already calls it
-            } else if (title === 'Popular Shayaris') {
+            } else if (
+              title === 'Popular Shayaris' ||
+              title === 'Most Loved Shaayris' ||
+              title === 'Favourite'
+            ) {
               navigation.navigate('Home');
             } else {
               navigation.goBack();
@@ -112,36 +118,38 @@ const CustomEditHeader = ({ theme, title, type, ads }) => {
 function HomeStack({ navigation }) {
   const { theme } = useTheme();
   const { isLogin } = useContext(AuthContext);
-  // INTERSTITIAL_AD_UNIT_ID;
-  const { AdConstants } = NativeModules;
-  console.log(
-    'Native Ad ID:',
-    JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID),
-  );
+  const { show } = useInterstitial();
 
-  const adUnitId = __DEV__
-    ? TestIds.INTERSTITIAL
-    : AdConstants.INTERSTITIAL_AD_UNIT_ID;
-  const [interstitialAds, setInterstitialAds] = useState(null);
-  useEffect(() => {
-    initInterstital();
-  }, []);
-  const initInterstital = async () => {
-    const interstitialAd = InterstitialAd.createForAdRequest(adUnitId);
-    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialAds(interstitialAd);
-      console.log('Interstital Ads Loaded');
-    });
-    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
-      console.log('Interstital Ads closed');
-    });
-    interstitialAd.load();
-  };
-  const showInterstitialAd = async () => {
-    if (interstitialAds) {
-      interstitialAds.show();
-    }
-  };
+  // INTERSTITIAL_AD_UNIT_ID;
+  // const { AdConstants } = NativeModules;
+  // //console.log(
+  //   'Native Ad ID:',
+  //   JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID),
+  // );
+
+  // const adUnitId = __DEV__
+  //   ? TestIds.INTERSTITIAL
+  //   : AdConstants.INTERSTITIAL_AD_UNIT_ID;
+  // const [interstitialAds, setInterstitialAds] = useState(null);
+  // useEffect(() => {
+  //   initInterstital();
+  // }, []);
+  // const initInterstital = async () => {
+  //   const interstitialAd = InterstitialAd.createForAdRequest(adUnitId);
+  //   interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+  //     setInterstitialAds(interstitialAd);
+  //     //console.log('Interstital Ads Loaded');
+  //   });
+  //   interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+  //     //console.log('Interstital Ads closed');
+  //   });
+  //   interstitialAd.load();
+  // };
+  // const showInterstitialAd = async () => {
+  //   if (interstitialAds) {
+  //     interstitialAds.show();
+  //   }
+  // };
 
   return (
     <Stack.Navigator initialRouteName="Splash">
@@ -188,7 +196,7 @@ function HomeStack({ navigation }) {
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    showInterstitialAd;
+                    // show();
                     return isLogin
                       ? navigation.navigate('HomeStack', {
                           screen: 'Writeshayari',
@@ -226,7 +234,6 @@ function HomeStack({ navigation }) {
               theme={theme}
               title={route.params.title}
               type={route.params.type}
-              ads={showInterstitialAd}
             />
           ),
         })}

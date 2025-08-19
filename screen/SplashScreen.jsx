@@ -16,10 +16,10 @@ const SplashScreen = ({ navigation }) => {
             // 1. App opened from quit/background via notification tap
             const remoteMessage = await messaging().getInitialNotification();
             if (remoteMessage) {
-                console.log(
-                    'Notification opened app from quit/background state:',
-                    remoteMessage.data
-                );
+                // //console.log(
+                // 'Notification opened app from quit/background state:',
+                //     remoteMessage.data
+                // );
 
                 setInitialNoti(remoteMessage);
 
@@ -27,16 +27,16 @@ const SplashScreen = ({ navigation }) => {
 
             // 2. Foreground notifications
             const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-                console.log('Foreground message received:', remoteMessage);
+                //console.log('Foreground message received:', remoteMessage);
             });
 
             // 3. App in background, opened via tap
             const unsubscribeOnNotificationOpenedApp =
                 messaging().onNotificationOpenedApp(async remoteMessage => {
-                    console.log(
-                        'Notification opened app from background state:',
-                        remoteMessage.data
-                    );
+                    // //console.log(
+                    // 'Notification opened app from background state:',
+                    //     remoteMessage.data
+                    //             );
 
                     setInitialNoti(remoteMessage);
                 });
@@ -58,7 +58,7 @@ const SplashScreen = ({ navigation }) => {
 
             // If no initial notification yet, set fallback to Home after 5 sec
             homeTimeoutRef.current = setTimeout(() => {
-                console.log("SplashScreen: No initial notification, navigating to Home.");
+                //console.log("SplashScreen: No initial notification, navigating to Home.");
                 navigation.replace("Home");
             }, 5000);
         })();
@@ -78,7 +78,7 @@ const SplashScreen = ({ navigation }) => {
                 homeTimeoutRef.current = null;
             }
 
-            console.log("SplashScreen: Initial notification detected. Fetching data...");
+            //console.log("SplashScreen: Initial notification detected. Fetching data...");
             setLoadingData(true);
 
             (async () => {

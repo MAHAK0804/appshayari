@@ -60,7 +60,7 @@ export default function CustomDrawerContent(props) {
       Linking.openURL("market://details?id=com.shayariapp").catch(console.error);
 
     } catch (error) {
-      console.log(error);
+      //console.log(error);
 
     }
     // finally {
@@ -95,7 +95,7 @@ export default function CustomDrawerContent(props) {
   🔗 https://play.google.com/store/apps/details?id=com.shayariapp`,
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
 
     } finally {
       updateActionStatus(false)
@@ -187,7 +187,7 @@ export default function CustomDrawerContent(props) {
               Linking.openURL("https://jhingurlab.blogspot.com/2025/08/privacy-policy.html")
 
             } catch (error) {
-              console.log(error);
+              //console.log(error);
 
             }
           }

@@ -60,7 +60,7 @@ export default function ShayariCardExact({ route }) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(require("../assets/image_1.webp"))
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   // const DEFAULT_BG = { uri: "https://shayaripoetry.s3.ap-south-1.amazonaws.com/bgImages/image_1.webp" }
@@ -119,12 +119,12 @@ export default function ShayariCardExact({ route }) {
 
       launchImageLibrary(options, (response) => {
         if (response.didCancel) {
-          console.log('User cancelled image picker');
+          //console.log('User cancelled image picker');
         } else if (response.errorCode) {
-          console.log('ImagePicker Error: ', response.errorMessage);
+          //console.log('ImagePicker Error: ', response.errorMessage);
         } else {
           const selectedImage = { uri: response.assets[0].uri };
-          console.log("selected2", selectedImage);
+          //console.log("selected2", selectedImage);
 
           setBackgroundImage(selectedImage);
           setBackgroundColor(null);
@@ -132,7 +132,7 @@ export default function ShayariCardExact({ route }) {
         }
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
 
     }
     finally {
@@ -173,7 +173,7 @@ export default function ShayariCardExact({ route }) {
   // const fetchBackgroundImages = async () => {
   //   try {
   //     const res = await axios.get("https://hindishayari.onrender.com/api/bg-images"); // Replace with your endpoint
-  //     console.log(res.data);
+  //     //console.log(res.data);
 
   //     setBgImages(res.data); // Assuming data is an array of image URLs
   //   } catch (err) {
@@ -241,7 +241,7 @@ export default function ShayariCardExact({ route }) {
       const stored = await AsyncStorage.getItem("favorites");
       setFavorites(stored ? JSON.parse(stored) : []);
     } catch (e) {
-      console.log("Failed to load favorites", e);
+      //console.log("Failed to load favorites", e);
     }
   };
 
@@ -250,7 +250,7 @@ export default function ShayariCardExact({ route }) {
       loadFavorites();
     }, [])
   );
-  console.log("selected", route.params, selectedShayari);
+  //console.log("selected", route.params, selectedShayari);
 
   return (
     <>
@@ -290,6 +290,7 @@ export default function ShayariCardExact({ route }) {
           style={[
             styles.shayariCard, // Use the new style for the card
             backgroundColor && { backgroundColor },
+            { opacity },
             // { position: "absolute", top: -30 + insets.top, height: "70%" }
           ]}
           ref={cardRef}

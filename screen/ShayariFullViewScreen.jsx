@@ -43,9 +43,9 @@ const CARD_HEIGHT = SCREEN_HEIGHT - scale(240);
 export default function ShayariFullViewScreen({ route }) {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  console.log("full view ", route.params.shayariList.length);
+  //console.log("full view ", route.params.shayariList.length);
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const [favorites, setFavorites] = useState([]);
@@ -63,7 +63,7 @@ export default function ShayariFullViewScreen({ route }) {
   const swipeIndicatorAnim = useSharedValue(0);
 
   const { shayariList, initialIndex } = route.params;
-  console.log("index", initialIndex);
+  //console.log("index", initialIndex);
 
   const flatListRef = useRef(null);
 
@@ -72,7 +72,7 @@ export default function ShayariFullViewScreen({ route }) {
       const stored = await AsyncStorage.getItem("favorites");
       setFavorites(stored ? JSON.parse(stored) : []);
     } catch (e) {
-      console.log("Failed to load favorites", e);
+      //console.log("Failed to load favorites", e);
     }
   };
 

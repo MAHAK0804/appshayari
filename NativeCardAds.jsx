@@ -21,7 +21,7 @@ export default function NativeCard() {
     const [nativeAd, setNativeAd] = useState(null);
     const [loading, setLoading] = useState(true); // 🔄 Add loading state
     const { AdConstants } = NativeModules;
-    console.log("Native Ad ID:", JSON.stringify(AdConstants.NATIVE_AD_UNIT_ID));
+    // //console.log("Native Ad ID:", JSON.stringify(AdConstants.NATIVE_AD_UNIT_ID));
 
     const adUnitId = __DEV__ ? TestIds.NATIVE : AdConstants.NATIVE_AD_UNIT_ID
     useEffect(() => {

@@ -66,6 +66,7 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Share from "react-native-share";
 import { AppContext } from "../AppContext";
+import useInterstitial from "../Ads";
 const { width } = Dimensions.get("screen");
 const numColumns = 3;
 const cardSize = width / numColumns - 25;
@@ -96,37 +97,77 @@ const HomeScreen = () => {
   const captureViewRef = useRef();
   const pageSize = 1000;
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  // //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
 
+  // const showAllStorage = async () => {
+  //   try {
+  //     const keys = await AsyncStorage.getAllKeys();
+  //     const result = await AsyncStorage.multiGet(keys);
+  //     //console.log("AsyncStorage Data: ", result);
+  //   } catch (error) {
+  //     //console.log("Error fetching AsyncStorage data", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   showAllStorage()
+  // }, [])
+
   // --- NEW STATE FOR EXIT POPUP ---
   const [exitModalVisible, setExitModalVisible] = useState(false);
-  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+  // //console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+  const { show } = useInterstitial();
+  // const adUnitId2 = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
+  // const [interstitial, setInterstitial] = useState(null);
+  // useEffect(() => {
+  //   initInterstital();
+  // }, []);
+  // const initInterstital = async () => {
+  //   const interstitialAd = InterstitialAd.createForAdRequest(
+  //     adUnitId2
+  //   );
+  //   interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+  //     setInterstitialAds(interstitialAd);
+  //     //console.log('Interstital Ads Loaded');
+  //   });
+  //   interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+  //     //console.log('Interstital Ads closed');
+  //   });
+  //   interstitialAd.load();
+  // };
+  // const showInterstitialAd = async () => {
+  //   if (interstitial) {
+  //     try {
+  //       await interstitial.show();
+  //     } catch (error) {
+  //       //console.log("Interstitial error: ", error);
+  //     }
+  //   } else {
+  //     //console.log("Interstitial not ready yet");
+  //   }
+  // };
 
-  const adUnitId2 = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
-  const [interstitialAds, setInterstitialAds] = useState(null);
-  useEffect(() => {
-    initInterstital();
-  }, []);
-  const initInterstital = async () => {
-    const interstitialAd = InterstitialAd.createForAdRequest(
-      adUnitId2
-    );
-    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialAds(interstitialAd);
-      console.log('Interstital Ads Loaded');
-    });
-    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
-      console.log('Interstital Ads closed');
-    });
-    interstitialAd.load();
-  };
-  const showInterstitialAd = async () => {
-    if (interstitialAds) {
-      await interstitialAds.show();
-    }
-  };
+  // useEffect(() => {
+  //   const interstitialAd = InterstitialAd.createForAdRequest(
+  //     adUnitId2,
+  //     { requestNonPersonalizedAdsOnly: true }
+  //   );
+
+  //   const adListener = interstitialAd.onAdEvent((type) => {
+  //     if (type === AdEventType.LOADED) {
+  //       setInterstitial(interstitialAd);
+  //     }
+  //     if (type === AdEventType.CLOSED || type === AdEventType.DISMISSED) {
+  //       // reload after dismissed
+  //       interstitialAd.load();
+  //     }
+  //   });
+
+  //   interstitialAd.load();
+
+  //   return () => adListener(); // cleanup
+  // }, []);
 
   const fetchShayaris = useCallback(
     async (pageNum) => {
@@ -142,7 +183,7 @@ const HomeScreen = () => {
         setHasMore(newShayaris.length === pageSize);
         setPage(pageNum);
       } catch (error) {
-        console.log("Error fetching shayaris ->", error);
+        // //console.log("Error fetching shayaris ->", error);
       } finally {
         setLoading(false);
         setIsFetchingMore(false);
@@ -150,7 +191,7 @@ const HomeScreen = () => {
     },
     [hasMore, isFetchingMore]
   );
-  console.log("shayar", shayaris.length);
+  // //console.log("shayar", shayaris.length);
 
   const getSpotlightShayaris = useCallback(async () => {
     try {
@@ -191,25 +232,23 @@ const HomeScreen = () => {
       const stored = await AsyncStorage.getItem("favorites");
       setFavorites(stored ? JSON.parse(stored) : []);
     } catch (e) {
-      console.log("Failed to load favorites", e);
+      // //console.log("Failed to load favorites", e);
     }
   };
 
   const saveFavorites = async (updatedFavorites) => {
     try {
       await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      setFavorites(updatedFavorites);
     } catch (error) {
-      console.log("Failed to save favorites", error);
+      // //console.log("Failed to save favorites", error);
     }
   };
-  console.log("favourtite", favorites);
+  // //console.log("favourtite", favorites);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadFavorites();
-    }, [])
-  );
+  useEffect(() => {
+    loadFavorites();
+  }, [])
+  // );
 
   // --- NEW BackHandler logic using useFocusEffect ---
   useFocusEffect(
@@ -226,24 +265,27 @@ const HomeScreen = () => {
   );
   // --------------------------------------------------
 
-  const toggleFavorite = useCallback(
-    (shayari) => {
-      const isFav = favorites.some((item) => item._id === shayari._id);
-      console.log("isFav", isFav);
+  const toggleFavorite = useCallback((shayari) => {
+    setFavorites((prev) => {
+      // //console.log("prev", prev);
 
+      const isFav = prev.some((item) => item._id === shayari._id);
       const updated = isFav
-        ? favorites.filter((item) => item._id !== shayari._id)
-        : [...favorites, shayari];
-      console.log("updated", updated);
+        ? prev.filter((item) => item._id !== shayari._id)
+        : [...prev, shayari];
 
       saveFavorites(updated);
+
       Toast.show(isFav ? "Removed from Favorites" : "Added to Favorites", {
         duration: Toast.durations.SHORT,
         position: Toast.positions.BOTTOM,
       });
-    },
-    [favorites]
-  );
+
+      return updated;
+    });
+  }, [saveFavorites]);
+
+
 
   const handleCopy = useCallback((item) => {
     Clipboard.setString(item.text?.replace(/\\n/g, "\n") || "");
@@ -382,13 +424,14 @@ const HomeScreen = () => {
     [navigation, theme.card, theme.text]
   );
 
-  const ShayariCard = React.memo(({ item, index }) => {
-    console.log("most ", item);
+  const ShayariCard = (({ item, index, favorite, toggleFavorites }) => {
+    // //console.log("most ", item);
+    // //console.log("fav", favorite);
 
     const backgroundColor = bgColors[index % bgColors.length];
     const textColor = backgroundColor === "#ffffff" ? "#111" : "#fff";
-    const isFavorite = favorites.some((fav) => fav._id === item._id);
-    console.log("shayariCard Fav", isFavorite);
+    // const isFavorite = favorite.some((fav) => fav._id === item._id);
+    // //console.log("shayariCard Fav", favorite.some((fav) => fav._id === item._id));
 
     const isCopied = copiedId === item._id;
     return (
@@ -411,8 +454,8 @@ const HomeScreen = () => {
             <TouchableOpacity onPress={() => handleEdit(item)}>
               <EditIcon width={40} height={40} fill={textColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFavorite(item)}>
-              {isFavorite ? (
+            <TouchableOpacity onPress={() => toggleFavorites(item)}>
+              {favorite ? (
                 <LikedIcon width={40} height={45} fill="#E91E63" />
               ) : (
                 <FavIcon width={40} height={40} fill={textColor} />
@@ -426,7 +469,7 @@ const HomeScreen = () => {
       </TouchableOpacity>
     );
   });
-  console.log(userId);
+  // //console.log(userId);
 
   const screenData = useMemo(() => {
     const data = [];
@@ -446,7 +489,7 @@ const HomeScreen = () => {
       data.push({ type: "header", id: "header_loved", title: "Most Loved Shayaris" });
     }
     shayaris.forEach((shayari, index) => {
-      data.push({ type: "shayari", id: shayari._id, item: shayari, index: index });
+      data.push({ type: "shayari", id: shayari._id, item: shayari, index: index, isFavorite: favorites.some((fav) => fav._id === shayari._id), });
       if ((index + 1) % 5 === 0) {
         data.push({ type: "ad", id: `ad_${index}` });
       }
@@ -455,7 +498,7 @@ const HomeScreen = () => {
       // }
     });
     return data;
-  }, [categories, spotlightShayaris, quickLinks, userId, shayaris]);
+  }, [categories, spotlightShayaris, quickLinks, userId, shayaris, favorites]);
 
   const renderItem = useCallback(
     ({ item }) => {
@@ -491,7 +534,7 @@ const HomeScreen = () => {
               <TouchableOpacity
                 style={styles.writeButton}
                 onPress={async () => {
-                  await showInterstitialAd;
+                  show();
 
                   return navigation.navigate(isLogin ? "Writeshayari" : "LoginScreen");
                 }}
@@ -539,7 +582,16 @@ const HomeScreen = () => {
         case "postSlider":
           return <PostSlider />;
         case "shayari":
-          return <ShayariCard item={item.item} index={item.index} />;
+          return (
+            <ShayariCard
+              item={item.item}
+              index={item.index}
+              favorite={item.isFavorite}   // ✅ plural rakho, array aa raha hai
+              toggleFavorites={toggleFavorite}  // ✅ same name rakho
+            />
+          );
+
+          ;
         case "ad":
           return (
             <View style={{ width: "100%", alignItems: "center", marginVertical: 10 }}>
@@ -609,17 +661,17 @@ const HomeScreen = () => {
               </View>
               <NativeCard />
               <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.shareButton} onPress={() => {
+                <TouchableOpacity style={styles.shareButton} onPress={async () => {
+                  updateActionStatus(true)
                   try {
-                    updateActionStatus(true)
-                    Share.open({ message: selectedShayari?.text.replace(/\\n/g, "\n") });
+                    await Share.open({ message: selectedShayari?.text.replace(/\\n/g, "\n") });
                   } catch (error) {
-                    console.log(error);
+                    // //console.log(error);
 
                   }
                   finally {
-                    updateActionStatus(false)
                     setCustomShareModalVisible(false);
+                    updateActionStatus(false)
                   }
 
                 }}>

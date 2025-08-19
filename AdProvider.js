@@ -27,7 +27,7 @@ export const AdProvider = ({ children }) => {
 
     newAd.addAdEventListener(AdEventType.LOADED, () => {
       setInterstitialLoaded(true);
-      console.log('Global Interstitial ad loaded');
+      //console.log('Global Interstitial ad loaded');
     });
 
     newAd.addAdEventListener(AdEventType.CLOSED, () => {
@@ -63,7 +63,7 @@ export const AdProvider = ({ children }) => {
         onAdClosedCallback();
       }
     } else {
-      console.log('Ad not ready, calling fallback directly.');
+      //console.log('Ad not ready, calling fallback directly.');
       onAdClosedCallback();
       // Try to load a new ad for the future.
       createAndLoadInterstitialAd();

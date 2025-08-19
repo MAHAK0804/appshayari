@@ -25,7 +25,7 @@ const cardSize = width / numColumns - 20;
 
 export default function AllCategories() {
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const { theme } = useTheme();

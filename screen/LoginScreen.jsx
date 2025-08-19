@@ -25,7 +25,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  // //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
   const navigation = useNavigation();
@@ -77,9 +77,9 @@ export default function LoginScreen() {
 
 
 
-        console.log("Login Response:", response.data);
+        // //console.log("Login Response:", response.data);
       } catch (error) {
-        console.log("Login Error ->", error.message);
+        // //console.log("Login Error ->", error.message);
         Alert.alert("Failed to send OTP. Please try again.");
       }
     },

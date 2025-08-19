@@ -45,7 +45,7 @@ export default function WriteShayari({ route }) {
   const { shayari = {} } = route?.params || {};
 
   // const shayari = { _id: 554554542, text: "dhfvsnbdvsnb" };
-  console.log(route.params);
+  //console.log(route.params);
 
   const navigation = useNavigation();
   const [fontSize] = useState(20);
@@ -117,7 +117,7 @@ export default function WriteShayari({ route }) {
       const stored = await AsyncStorage.getItem("favorites");
       setFavorites(stored ? JSON.parse(stored) : []);
     } catch (e) {
-      console.log("Failed to load favorites", e);
+      //console.log("Failed to load favorites", e);
     }
   };
 
@@ -132,7 +132,7 @@ export default function WriteShayari({ route }) {
       await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
       setFavorites(updatedFavorites);
     } catch (error) {
-      console.log("Failed to save favorites", error);
+      //console.log("Failed to save favorites", error);
     }
   };
 
@@ -192,7 +192,7 @@ export default function WriteShayari({ route }) {
       updateActionStatus(true)
 
       // Toast.show(uri)
-      console.log("uri", uri);
+      //console.log("uri", uri);
 
       await Share.open({ url: uri });
     } catch (error) {
@@ -210,18 +210,18 @@ export default function WriteShayari({ route }) {
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Storage permission denied');
+        //console.log('Storage permission denied');
         return;
       }
 
 
       try {
         await CameraRoll.saveAsset(uri, { type: 'photo' });
-        console.log('Image saved to gallery!');
+        //console.log('Image saved to gallery!');
         Alert.alert("Image Save to Gallery")
 
       } catch (error) {
-        console.log('Save error:', error);
+        //console.log('Save error:', error);
       }
     };
   };
@@ -300,7 +300,7 @@ export default function WriteShayari({ route }) {
                     );
 
                   } catch (error) {
-                    console.log("Shayari save error:", error);
+                    //console.log("Shayari save error:", error);
                     showCustomAlert("Error", "Failed to save Shayari.");
                   }
                 }}
@@ -402,14 +402,14 @@ export default function WriteShayari({ route }) {
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     style={styles.shareButton}
-                    onPress={() => {
+                    onPress={async () => {
+                      updateActionStatus(true)
                       try {
-                        updateActionStatus(true)
-                        Share.open({
+                        await Share.open({
                           message: shayariText.replace(/\\n/g, "\n"),
                         });
                       } catch (error) {
-                        console.log(error);
+                        //console.log(error);
 
                       }
                       finally {

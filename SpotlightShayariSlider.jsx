@@ -39,12 +39,12 @@ export default function ShayariSpotlightSlider({
   // }, []);
 
   const refreshShayaris = useCallback(async () => {
-    console.log(fetchNewShayaris);
+    // //console.log(fetchNewShayaris);
 
     try {
       if (typeof fetchNewShayaris === "function") {
         const newData = await fetchNewShayaris();
-        console.log(newData);
+        // //console.log(newData);
 
         const topThree = newData.slice(0, 3);
         setLatestShayaris(topThree);
@@ -52,7 +52,7 @@ export default function ShayariSpotlightSlider({
         flatListRef.current?.scrollToIndex({ index: 0, animated: false });
       }
     } catch (err) {
-      console.error("Error fetching new shayaris:", err);
+      // console.error("Error fetching new shayaris:", err);
     }
   }, [fetchNewShayaris]);
 

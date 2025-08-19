@@ -22,7 +22,7 @@ import axios from "axios";
 import { AuthContext } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
 
-import { fontScale, scaleFont } from "./Responsive";
+import { fontScale, scale, scaleFont } from "./Responsive";
 
 const { width } = Dimensions.get("window");
 
@@ -33,7 +33,7 @@ const PostSlider = () => {
   const [setLikedIds] = useState([]);
   const scrollX = useRef(new Animated.Value(0)).current;
   const { userId } = useContext(AuthContext);
-  console.log("post user", userId);
+  // //console.log("post user", userId);
 
   useEffect(() => {
     const fetchShayaris = async () => {
@@ -41,15 +41,15 @@ const PostSlider = () => {
         const res = await axios.get(
           "https://hindishayari.onrender.com/api/users/shayaris/all"
         );
-        // console.log("userId =>", userId);
+        // //console.log("userId =>", userId);
         // res.data.forEach((el) => {
-        //   console.log("Comparing", el.userId?._id, "==", userId);
+        //   //console.log("Comparing", el.userId?._id, "==", userId);
         // });
 
 
         setShayariList(res.data.filter((el) => el.userId._id === userId));
       } catch (error) {
-        console.log("Error fetching shayaris ->", error);
+        // //console.log("Error fetching shayaris ->", error);
       }
     };
 
@@ -64,7 +64,7 @@ const PostSlider = () => {
         const favs = stored ? JSON.parse(stored) : [];
         setLikedIds(favs.map((item) => item._id));
       } catch (err) {
-        console.log("Failed to load favorites", err);
+        // //console.log("Failed to load favorites", err);
       }
     })();
   }, []);
@@ -86,7 +86,7 @@ const PostSlider = () => {
   //       position: Toast.positions.BOTTOM,
   //     });
   //   } catch (err) {
-  //     console.log("Toggle like failed", err);
+  //     //console.log("Toggle like failed", err);
   //   }
   // }, []);
 
@@ -120,9 +120,9 @@ const PostSlider = () => {
 
       const cardStyle = [
         styles.postCard,
-        { width: widthOverride || width / 2 - 25, marginHorizontal: 5 },
+        { width: widthOverride || width / 2 - scale(30), marginHorizontal: scale(5) },
       ];
-      // console.log("shayri", postData);
+      // //console.log("shayri", postData);
 
       return (
         <TouchableOpacity onPress={() => {
@@ -198,7 +198,7 @@ const PostSlider = () => {
       {/* 1 Post */}
       {length === 1 && (
         <View style={{ paddingHorizontal: 15 }}>
-          {renderItem({ item: postData[0], widthOverride: width - 40 })}
+          {renderItem({ item: postData[0], widthOverride: width - scale(55) })}
         </View>
       )}
 

@@ -28,8 +28,8 @@ import { AuthProvider } from './AuthContext.js';
 import Toast from 'react-native-root-toast';
 import messaging from '@react-native-firebase/messaging';
 import { NativeModules } from 'react-native';
-import { AdProvider } from './AdProvider.js';
-import { AppContext, AppProvider } from './AppContext.js';
+// import { AdProvider } from './AdProvider.js';
+import { AppContext } from './AppContext.js';
 const { KillApp } = NativeModules;
 // Ignore all log warnings for a cleaner console output during development
 LogBox.ignoreAllLogs();
@@ -46,7 +46,7 @@ const sendTokenToServer = async token => {
       },
     );
     const data = await response.json();
-    console.log('Token sent to server:', data);
+    // //console.log('Token sent to server:', data);
   } catch (error) {
     console.error('Error sending token to server:', error);
   }
@@ -84,12 +84,12 @@ export default function App() {
       //   authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       // if (enabled) {
-      //   console.log('Firebase Messaging: Authorization status:', authStatus);
+      //   //console.log('Firebase Messaging: Authorization status:', authStatus);
       //   const fcmToken = await messaging().getToken();
       //   await sendTokenToServer(fcmToken);
-      //   console.log('Firebase Messaging: FCM Token:', fcmToken);
+      //   //console.log('Firebase Messaging: FCM Token:', fcmToken);
       // } else {
-      console.log('Firebase Messaging: User denied notification permissions.');
+      // //console.log('Firebase Messaging: User denied notification permissions.');
       Alert.alert(
         'Notification Permission Denied',
         'Please enable notification permissions in your device settings to receive important updates.',
@@ -113,7 +113,7 @@ export default function App() {
 
   const checkNotificationStatusAndRequest = async () => {
     const settings = await messaging().hasPermission();
-    console.log('set', settings);
+    // //console.log('set', settings);
 
     if (
       settings === messaging.AuthorizationStatus.NOT_DETERMINED ||
@@ -126,7 +126,7 @@ export default function App() {
       // You can still get the token and set up listeners.
       const fcmToken = await messaging().getToken();
       await sendTokenToServer(fcmToken);
-      console.log('Firebase Messaging: FCM Token (already granted):', fcmToken);
+      // //console.log('Firebase Messaging: FCM Token (already granted):', fcmToken);
     }
   };
 
@@ -146,7 +146,7 @@ export default function App() {
           // It's good practice to initialize AdMob on iOS too if applicable
           const status = await MobileAds().initialize();
           if (__DEV__) {
-            console.log('AdMob initialized:', status);
+            //console.log('AdMob initialized:', status);
           }
         }
         setIsReady(true);

@@ -39,8 +39,9 @@ import {
 } from "react-native-google-mobile-ads";
 import NativeCard from "../NativeCardAds";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { useInterstitialAd } from "../AdProvider";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import useInterstitial from "../Ads";
+// import { useInterstitialAd } from "../AdProvider";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 30;
@@ -55,10 +56,11 @@ const ITEMS_PER_PAGE = 12;
 export default function ShayariListScreen({ route }) {
   const navigation = useNavigation();
   const { AdConstants } = NativeModules;
-  console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  // //console.log("Ad ID:", JSON.stringify(AdConstants.BANNER_AD_UNIT_ID));
+  const { show } = useInterstitial();
 
   const adUnitId = __DEV__ ? TestIds.BANNER : AdConstants.BANNER_AD_UNIT_ID
-  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+  // //console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
 
   const adUnitId2 = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
   const cardRefs = useRef({});
@@ -94,7 +96,7 @@ export default function ShayariListScreen({ route }) {
 
   //   newAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
   //     setRewardLoaded(true);
-  //     console.log("Rewarded ad loaded");
+  //     //console.log("Rewarded ad loaded");
   //   });
 
 
@@ -149,7 +151,7 @@ export default function ShayariListScreen({ route }) {
     setInitialLoading(true);
     try {
       const res = await axios.get(`${API_URL}/users/shayaris/all`);
-      console.log(res.data.filter((el) => el.userId._id === userId));
+      //console.log(res.data.filter((el) => el.userId._id === userId));
       setAllShayari(res.data.filter((el) => el.userId._id === userId))
       setShayariList(res.data.filter((el) => el.userId._id === userId));
     } catch (error) {
@@ -214,7 +216,7 @@ export default function ShayariListScreen({ route }) {
   };
 
   // --- USEEFFECT HOOKS ---
-  console.log("title", title);
+  //console.log("title", title);
   // Fetch categories once (independent of type)
   useEffect(() => {
     fetchCategories();
@@ -226,9 +228,14 @@ export default function ShayariListScreen({ route }) {
 
     // }
   }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
 
+    }, [])
+  );
   useEffect(() => {
-    loadFavorites();
+    // loadFavorites();
     if (type === "all") {
       fetchCategories();
       fetchShayaris(1, "All", true);
@@ -265,7 +272,7 @@ export default function ShayariListScreen({ route }) {
         setTitle("All Shayaris");
       } else {
         const found = categories.find((cat) => cat._id === selectedCategory);
-        console.log(found);
+        //console.log(found);
         if (found) {
           fetchAllShayaris(found._id)
           setTitle(found.title);
@@ -280,28 +287,28 @@ export default function ShayariListScreen({ route }) {
     }
   }, [selectedCategory, categories, type]);
   // const { showAd } = useInterstitialAd()
-  const [interstitialAds, setInterstitialAds] = useState(null);
-  useEffect(() => {
-    initInterstital();
-  }, []);
-  const initInterstital = async () => {
-    const interstitialAd = InterstitialAd.createForAdRequest(
-      adUnitId2
-    );
-    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialAds(interstitialAd);
-      console.log('Interstital Ads Loaded');
-    });
-    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
-      console.log('Interstital Ads closed');
-    });
-    interstitialAd.load();
-  };
-  const showInterstitialAd = async () => {
-    if (interstitialAds) {
-      await interstitialAds.show();
-    }
-  };
+  // const [interstitialAds, setInterstitialAds] = useState(null);
+  // useEffect(() => {
+  //   initInterstital();
+  // }, []);
+  // const initInterstital = async () => {
+  //   const interstitialAd = InterstitialAd.createForAdRequest(
+  //     adUnitId2
+  //   );
+  //   interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+  //     setInterstitialAds(interstitialAd);
+  //     //console.log('Interstital Ads Loaded');
+  //   });
+  //   interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+  //     //console.log('Interstital Ads closed');
+  //   });
+  //   interstitialAd.load();
+  // };
+  // const showInterstitialAd = async () => {
+  //   if (interstitialAds) {
+  //     await interstitialAds.show();
+  //   }
+  // };
   // --- HANDLERS ---
 
   const handleLoadMore = () => {
@@ -322,7 +329,7 @@ export default function ShayariListScreen({ route }) {
     setCategoryClickCount((prev) => {
       const newCount = prev + 1;
       if (newCount % 3 === 0) {
-        showInterstitialAd;
+        show()
       }
       return newCount;
     });
@@ -342,16 +349,16 @@ export default function ShayariListScreen({ route }) {
     setFavorites((prev) => prev.filter((item) => item._id !== shayariId));
   };
   const handleExpand = (titleText, shayari, filteredShayaris) => {
-    console.log("length", allshayari.length);
+    //console.log("length", allshayari.length);
 
-    return navigation.navigate("HomeStack", {
-      screen: "ShayariFullView",
-      params: {
-        title: titleText,
-        shayariList: filteredShayaris,
-        shayari,
-        initialIndex: filteredShayaris.findIndex((s) => s._id === shayari._id),
-      },
+    return navigation.navigate("ShayariFullView", {
+      // screen: "ShayariFullView",
+      // params: {
+      title: titleText,
+      shayariList: filteredShayaris,
+      shayari,
+      initialIndex: filteredShayaris.findIndex((s) => s._id === shayari._id),
+      // },
     });
   };
   // --- SHAYARI CARD COMPONENT ---

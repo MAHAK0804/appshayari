@@ -19,7 +19,7 @@ export default function CustomShareModal({
   cardRef,
   shayari,
 }) {
-  console.log("shayari", shayari);
+  // //console.log("shayari", shayari);
   const { updateActionStatus } = useContext(AppContext);
 
   if (!visible) return null;
@@ -30,7 +30,7 @@ export default function CustomShareModal({
     try {
 
       // Toast.show(uri)
-      console.log("uri", uri);
+      // //console.log("uri", uri);
       updateActionStatus(true)
       await Share.open({ url: uri });
     } catch (error) {
@@ -49,7 +49,7 @@ export default function CustomShareModal({
         : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
       const hasPermission = await PermissionsAndroid.check(permission);
-      console.log("per", hasPermission);
+      // //console.log("per", hasPermission);
 
 
       if (!hasPermission) {
@@ -99,14 +99,14 @@ export default function CustomShareModal({
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={[styles.shareButton, { gap: 7 }]}
-            onPress={() => {
+            onPress={async () => {
+              updateActionStatus(true)
               try {
-                updateActionStatus(true)
-                Share.open({
+                await Share.open({
                   message: shayari?.text.replace(/\\n/g, "\n"),
                 });
               } catch (error) {
-                console.log(error);
+                // //console.log(error);
 
               } finally {
                 onClose();

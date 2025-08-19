@@ -9,7 +9,7 @@ export async function requestNotificationPermission() {
         // Android 13+
         const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
         if (result === RESULTS.GRANTED) {
-          console.log('✅ Notification permission granted (Android 13+)');
+          //console.log('✅ Notification permission granted (Android 13+)');
           Alert.alert('Permission granted');
           return true;
         } else {
@@ -27,7 +27,7 @@ export async function requestNotificationPermission() {
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
         if (enabled) {
-          console.log('✅ Notification permission granted (iOS)');
+          //console.log('✅ Notification permission granted (iOS)');
           return true;
         } else {
           Alert.alert(
@@ -45,7 +45,7 @@ export async function requestNotificationPermission() {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        console.log('✅ Notification permission granted (iOS)');
+        //console.log('✅ Notification permission granted (iOS)');
         return true;
       } else {
         Alert.alert(

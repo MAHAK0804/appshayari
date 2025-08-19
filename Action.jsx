@@ -18,8 +18,9 @@ import Toast from "react-native-root-toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Clipboard from "@react-native-clipboard/clipboard";
+import useInterstitial from "./Ads";
 // import { useInterstitialAd } from "./AdProvider";
-import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+// import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 // import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 export default function ShayariCardActions({
@@ -38,33 +39,35 @@ export default function ShayariCardActions({
 }) {
   const [copied, setCopied] = useState(false);
   const [isFav, setIsFav] = useState(false);
-  // const { showAd } = useInterstitialAd();
-  const { AdConstants } = NativeModules;
-  console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+  const { show } = useInterstitial();
 
-  const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
-  const [interstitialAds, setInterstitialAds] = useState(null);
-  useEffect(() => {
-    initInterstital();
-  }, []);
-  const initInterstital = async () => {
-    const interstitialAd = InterstitialAd.createForAdRequest(
-      adUnitId
-    );
-    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
-      setInterstitialAds(interstitialAd);
-      console.log('Interstital Ads Loaded');
-    });
-    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
-      console.log('Interstital Ads closed');
-    });
-    interstitialAd.load();
-  };
-  const showInterstitialAd = async () => {
-    if (interstitialAds) {
-      await interstitialAds.show();
-    }
-  };
+  // const { showAd } = useInterstitialAd();
+  // const { AdConstants } = NativeModules;
+  // //console.log("Native Ad ID:", JSON.stringify(AdConstants.INTERSTITIAL_AD_UNIT_ID));
+
+  // const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : AdConstants.INTERSTITIAL_AD_UNIT_ID
+  // const [interstitialAds, setInterstitialAds] = useState(null);
+  // useEffect(() => {
+  //   initInterstital();
+  // }, []);
+  // const initInterstital = async () => {
+  //   const interstitialAd = InterstitialAd.createForAdRequest(
+  //     adUnitId
+  //   );
+  //   interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+  //     setInterstitialAds(interstitialAd);
+  //     //console.log('Interstital Ads Loaded');
+  //   });
+  //   interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+  //     //console.log('Interstital Ads closed');
+  //   });
+  //   interstitialAd.load();
+  // };
+  // const showInterstitialAd = async () => {
+  //   if (interstitialAds) {
+  //     await interstitialAds.show();
+  //   }
+  // };
 
 
   const navigation = useNavigation();
@@ -80,7 +83,7 @@ export default function ShayariCardActions({
 
   //   newAd.addAdEventListener(AdEventType.LOADED, () => {
   //     setInterstitialLoaded(true);
-  //     console.log("Interstitial ad loaded");
+  //     //console.log("Interstitial ad loaded");
   //   });
 
   //   newAd.addAdEventListener(AdEventType.CLOSED, () => {
@@ -112,7 +115,7 @@ export default function ShayariCardActions({
   //       });
   //     }
   //   } else {
-  //     console.log("Interstitial not ready, loading new one...");
+  //     //console.log("Interstitial not ready, loading new one...");
   //     navigation.navigate("HomeStack", {
   //       screen: "ShayariEditScreen",
   //       params: { shayari },
@@ -131,7 +134,7 @@ export default function ShayariCardActions({
 
     // const current = Number(await AsyncStorage.getItem("Copycount")) || 0;
     // const updatedCount = current + 1;
-    // console.log("updateCount", updatedCount);
+    // //console.log("updateCount", updatedCount);
 
     // await AsyncStorage.setItem("Copycount", String(updatedCount));
     // setCopyCount(updatedCount);
@@ -177,7 +180,7 @@ export default function ShayariCardActions({
       await AsyncStorage.setItem("favorites", JSON.stringify(updated));
       setIsFav(!alreadyFav);
     } catch (e) {
-      console.log("Failed to toggle favorite", e);
+      //console.log("Failed to toggle favorite", e);
     }
   };
 
@@ -193,7 +196,7 @@ export default function ShayariCardActions({
       // }
       // else {
       if (isCat) {
-        await showInterstitialAd();
+        show()
         return navigation.navigate("HomeStack", {
           screen: "ShayariEditScreen",
           params: { shayari },
