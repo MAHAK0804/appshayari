@@ -150,16 +150,12 @@ export default function ShayariCardExact({ route }) {
     { id: "6", name: "Font align", iconName: "align-center", type: "align" },
   ];
   const fonts = [
-    { name: "serif", label: "Serif" },
     { name: "monospace", label: "Monospace" },
     { name: "sans-serif", label: "Sans-serif" },
     { name: "Manrope_600SemiBold", label: "Manrope" },
     { name: "Kameron_600SemiBold", label: "Kameron" },
     { name: "sans-serif", label: " Sans Serif" },
-    { name: "sans-serif-light", label: "Sans Serif Light" },
-    { name: "sans-serif-medium", label: "Sans Serif Medium" },
-    { name: "sans-serif-black", label: "Sans Serif Black" },
-    { name: "sans-serif-condensed", label: "Sans Serif Condensed" },
+
     { name: "cursive", label: "Cursive" },
     { name: "casual", label: "Casual" },
   ];
@@ -360,7 +356,7 @@ export default function ShayariCardExact({ route }) {
                 <View style={styles.sliderColumn}>
                   <Slider
                     style={styles.verticalSlider}
-                    minimumValue={0}
+                    minimumValue={0.5}
                     maximumValue={1}
                     step={0.01}
                     value={opacity}
